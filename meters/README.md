@@ -68,6 +68,11 @@ needs a valid login in the current user's Keychain. Build dependencies are pinne
 to the original app's versions; packaging may need adjustment on other Python or
 macOS releases.
 
+The native window opens with Codex and Claude side by side. Drag a corner to
+scale both gauges in either layout. Squash the width until the window is less
+than 1.2 times as wide as it is tall to stack them; widen it to restore the row. Gauges and selectors scale together to fit shorter windows without
+clipping. The app remembers the resized window for future launches.
+
 The native app offers **All Models / Fable** and **5H Session / 7D Weekly** display
 selectors and remembers them. The shared five-hour quota is the same under both
 allowances. These controls do not change the running agent's model. Native
@@ -92,7 +97,8 @@ threshold indicators, so color alone is not an authoritative hold verdict.
 In native `--demo` mode, the Demo menu provides normal, loading, unavailable,
 expired, stale, weekly hold, hard cutoff, behind pace, and on-pace states
 (Cmd-1 through Cmd-9). Cmd-minus selects the minimum size, Cmd-equals restores
-the default, and Cmd-0 selects a wide window. Try both allowance and period
+the horizontal default, Cmd-0 selects a wide window, and Cmd-S selects the
+full-size vertical stack. Cmd-H previews a smaller horizontal window. Try both allowance and period
 selectors. Demo mode does not read account data or save display preferences.
 
 Terminal hold estimates use the display's 360-second freshness budget and show an

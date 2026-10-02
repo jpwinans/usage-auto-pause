@@ -28,7 +28,9 @@ os.environ['PATH'] = ':'.join(dict.fromkeys([
     '/opt/local/bin', '/usr/bin', '/bin', *os.environ.get('PATH', '').split(':')]))
 
 DEMO = '--demo' in sys.argv
-WIDTH, HEIGHT = 396, 790
+WIDTH, HEIGHT = 772, 446
+STACK_WIDTH, STACK_HEIGHT = 396, 790
+WRAP_ASPECT = 1.2
 GREEN, YELLOW, RED = '#68d58b', '#f3c54f', '#ff5148'
 
 
@@ -103,6 +105,7 @@ class MeterView(NSView):
         self.allowance_switch.setAction_('changeAllowance:')
         self.allowance_switch.setToolTip_('Display All Models or Fable weekly usage; does not change any agent model')
         self.addSubview_(self.allowance_switch)
+        self.setFrameSize_(frame.size)
         return self
 
     def isFlipped(self):
@@ -110,11 +113,20 @@ class MeterView(NSView):
 
     def setFrameSize_(self, size):
         objc.super(MeterView, self).setFrameSize_(size)
-        # Keep the instruments circular and the native switch in the same
-        # coordinate system at every window size. Center any spare space.
-        scale = max(.01, min(size.width / WIDTH, size.height / HEIGHT))
+        # Choose orientation by shape, not absolute width: corner resizing
+        # should scale a row, while squeezing its width should make a stack.
+        # Native controls share the uniformly scaled drawing coordinates.
+        self.horizontal = size.width / max(1, size.height) >= WRAP_ASPECT
+        canvas_width, canvas_height = ((WIDTH, HEIGHT) if self.horizontal
+                                       else (STACK_WIDTH, STACK_HEIGHT))
+        scale = max(.01, min(size.width / canvas_width, size.height / canvas_height))
         width, height = size.width / scale, size.height / scale
-        self.setBounds_(NSMakeRect((WIDTH-width)/2, (HEIGHT-height)/2, width, height))
+        self.setBounds_(NSMakeRect((canvas_width-width)/2,
+                                  (canvas_height-height)/2, width, height))
+        if hasattr(self, 'switch'):
+            x, y = (424, 16) if self.horizontal else (48, 360)
+            self.switch.setFrame_(NSMakeRect(x, y+379, 300, 27))
+            self.allowance_switch.setFrame_(NSMakeRect(x, y+344, 300, 27))
         self.setNeedsDisplay_(True)
 
     def changeWindow_(self, sender):
@@ -146,8 +158,7 @@ class MeterView(NSView):
         self.setNeedsDisplay_(True)
 
     @objc.python_method
-    def meter(self, provider, y, period, height):
-        x = 20
+    def meter(self, provider, x, y, period, height):
         frame = NSMakeRect(x,y,356,height)
         case = NSBezierPath.bezierPathWithRoundedRect_xRadius_yRadius_(frame,23,23)
         NSGradient.alloc().initWithStartingColor_endingColor_(color('#283a34'),color('#101916')).drawInBezierPath_angle_(case,90)
@@ -276,8 +287,10 @@ class MeterView(NSView):
     def drawRect_(self, rect):
         color('#0b0f0d').setFill()
         NSRectFill(self.bounds())
-        self.meter('Codex',16,'weekly',328)
-        self.meter('Claude',360,self.period,414)
+        horizontal = getattr(self, 'horizontal', True)
+        self.meter('Codex',20,16,'weekly',414 if horizontal else 328)
+        self.meter('Claude',396 if horizontal else 20,
+                   16 if horizontal else 360,self.period,414)
 
 
 class AppDelegate(NSObject):
@@ -290,7 +303,7 @@ class AppDelegate(NSObject):
             NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskResizable,
             NSBackingStoreBuffered, False)
         self.window.setTitle_('LLM Pacing · Demo' if DEMO else 'LLM Pacing')
-        self.window.setContentMinSize_((297, 592.5))
+        self.window.setContentMinSize_((297, 223))
         self.window.setAppearance_(NSAppearance.appearanceNamed_(NSAppearanceNameDarkAqua))
         self.window.setBackgroundColor_(color('#0b0f0d'))
         self.window.setReleasedWhenClosed_(False)
@@ -299,7 +312,7 @@ class AppDelegate(NSObject):
         self.window.setContentView_(self.view)
         self.window.center()
         if not DEMO:
-            self.window.setFrameAutosaveName_('LLMPacingWindow')
+            self.window.setFrameAutosaveName_('LLMPacingResponsiveWindow')
         self.window.makeKeyAndOrderFront_(None)
         NSApplication.sharedApplication().activateIgnoringOtherApps_(True)
         self.installMenu()
@@ -332,7 +345,9 @@ class AppDelegate(NSObject):
         if DEMO:
             for title, action, key in [('Demo: Minimum window','minimumDemo:','-'),
                                        ('Demo: Default window','defaultDemo:','='),
-                                       ('Demo: Wide window','wideDemo:','0')]:
+                                       ('Demo: Wide window','wideDemo:','0'),
+                                       ('Demo: Stacked window','stackedDemo:','s'),
+                                       ('Demo: Small horizontal window','smallHorizontalDemo:','h')]:
                 size_item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(title,action,key)
                 size_item.setTarget_(self)
                 submenu.addItem_(size_item)
@@ -342,13 +357,19 @@ class AppDelegate(NSObject):
         NSApplication.sharedApplication().setMainMenu_(menu)
 
     def minimumDemo_(self, sender):
-        self.window.setContentSize_((297,592.5))
+        self.window.setContentSize_((297,446))
 
     def defaultDemo_(self, sender):
         self.window.setContentSize_((WIDTH,HEIGHT))
 
     def wideDemo_(self, sender):
-        self.window.setContentSize_((594,790))
+        self.window.setContentSize_((1000,580))
+
+    def smallHorizontalDemo_(self, sender):
+        self.window.setContentSize_((579,334.5))
+
+    def stackedDemo_(self, sender):
+        self.window.setContentSize_((STACK_WIDTH,STACK_HEIGHT))
 
     def changeDemo_(self, sender):
         self.demo_state = ('normal','loading','unavailable','expired','stale','hold','hard','behind','on_pace')[sender.tag()]

@@ -40,3 +40,27 @@ The browser shares the palette and corrected gauge geometry, but its visual
 inspection was blocked by UI approval review. Automated checks do not substitute
 for that remaining browser visual check. The published native screenshot uses
 only synthetic readings.
+
+## Responsive native layout
+
+The default content size is 772 × 446 points, with Codex and Claude side by
+side. The cards stack when content width / height falls below 1.2. This
+shape-based breakpoint preserves orientation during proportional corner
+resizing. The minimum content size is 297 × 223 points. Both layouts scale uniformly
+to fit the available height, preserving circular dials and keeping selectors
+inside the Claude card. Very short stacked windows have smaller text; enlarge
+the height for easier reading. Window geometry uses a new saved preference so
+the previous vertical default does not override the first horizontal launch.
+
+The responsive demo was manually checked in all nine display states, with both
+Claude selectors, the full-size vertical stack, and the smallest window. Long
+stale/hold labels and controls remained inside their cards. User testing
+confirmed the corrected corner-resize behavior.
+
+Corner resizing was subsequently verified by dragging the live demo from
+772 × 446 to approximately 579 × 335 points and back, preserving the horizontal
+row and scaling both gauges. Dragging only the side edge inward stacked the
+cards; widening restored the row. Regression tests cover proportional resizing
+in both orientations and width-only reflow. The earlier fixed-width breakpoint
+and 446-point minimum height prevented useful horizontal shrinking; the
+shape-based breakpoint and lower minimum height correct that behavior.

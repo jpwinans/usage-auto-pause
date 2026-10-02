@@ -3,6 +3,7 @@ import ast
 import math
 from pathlib import Path
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 import native_data
 
@@ -36,6 +37,45 @@ class MeterDesignTests(unittest.TestCase):
         self.assertGreater(right[0],0)
         self.assertEqual(position(-100),left)
         self.assertEqual(position(100),right)
+
+    def resize_view(self, width, height):
+        # Execute the actual resize callback with only AppKit boundary calls
+        # stubbed, so these geometry checks also run on non-macOS machines.
+        tree = ast.parse(NATIVE)
+        view_class = next(n for n in tree.body
+                          if isinstance(n, ast.ClassDef) and n.name == 'MeterView')
+        method = next(n for n in view_class.body
+                      if isinstance(n, ast.FunctionDef) and n.name == 'setFrameSize_')
+        constants = [n for n in tree.body if isinstance(n, ast.Assign)
+                     and any(isinstance(name, ast.Name) and name.id in
+                             ('WIDTH', 'STACK_WIDTH', 'WRAP_WIDTH', 'WRAP_ASPECT')
+                             for target in n.targets for name in ast.walk(target))]
+        namespace = {
+            'objc': SimpleNamespace(super=lambda *args: SimpleNamespace(
+                setFrameSize_=lambda size: None)),
+            'MeterView': object, 'NSMakeRect': lambda *args: args,
+        }
+        exec(compile(ast.Module(body=constants+[method], type_ignores=[]),
+                     'native resize callback', 'exec'), namespace)
+        view = SimpleNamespace(setNeedsDisplay_=lambda value: None)
+        view.setBounds_ = lambda bounds: setattr(view, 'bounds', bounds)
+        namespace['setFrameSize_'](view, SimpleNamespace(width=width, height=height))
+        return view
+
+    def test_corner_resize_scales_without_changing_orientation(self):
+        for width, height, horizontal in ((772, 446, True), (396, 790, False)):
+            for factor in (.75, 1, 1.5):
+                with self.subTest(horizontal=horizontal, factor=factor):
+                    view = self.resize_view(width*factor, height*factor)
+                    self.assertEqual(view.horizontal, horizontal)
+                    # Equal x/y scaling preserves circular dials.
+                    self.assertAlmostEqual(width*factor/view.bounds[2], factor)
+                    self.assertAlmostEqual(height*factor/view.bounds[3], factor)
+
+    def test_squashing_width_stacks_and_widening_restores_row(self):
+        self.assertTrue(self.resize_view(772, 446).horizontal)
+        self.assertFalse(self.resize_view(396, 446).horizontal)
+        self.assertTrue(self.resize_view(772, 446).horizontal)
 
     def test_text_and_meaningful_graphics_have_aa_contrast(self):
         # Brightest conservative glass surface bounds neutral labels.

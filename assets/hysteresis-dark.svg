@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="410" viewBox="0 0 1180 410" role="img" aria-labelledby="title desc">
+<title id="title">Why pause at plus eight hours and resume at plus four?</title><desc id="desc">With fresh readings and a stable weekly window, an unlatched plus seven hour lead proceeds. Plus eight triggers a hold. Plus six remains held. Plus four releases. This schematic assumes no other applicable hold.</desc>
+<defs>
+<marker id="arrow-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#9da7b3"/></marker>
+<marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#58a6ff"/></marker>
+<marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#bc8cff"/></marker>
+<marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#e3b341"/></marker>
+<marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#56d364"/></marker>
+</defs>
+<rect x="0.5" y="0.5" width="1179" height="409" rx="16" fill="#0d1117" fill-opacity="1" stroke="#30363d"/>
+<text x="32" y="43" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="24" font-weight="650" text-anchor="start">Pause once. Give the budget time to catch up.</text>
+<text x="32" y="72" fill="#9da7b3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">Default weekly rule · fresh readings · same quota window · no other hold</text>
+<rect x="424" y="120" width="598" height="151" rx="12" fill="#e3b341" fill-opacity="0.08"/>
+<text x="32" y="159" fill="#e3b341" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" text-anchor="start">+8h trigger</text>
+<path d="M166 154 H1128" fill="none" stroke="#e3b341" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 6"/>
+<text x="32" y="247" fill="#56d364" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="600" text-anchor="start">+4h release</text>
+<path d="M166 242 H1128" fill="none" stroke="#56d364" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 6"/>
+<path d="M210 176 L440 154" fill="none" stroke="#58a6ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M440 154 L730 198 L1010 242" fill="none" stroke="#e3b341" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="210" cy="176" r="8" fill="#0d1117"/>
+<circle cx="210" cy="176" r="5" fill="#58a6ff"/>
+<text x="210" y="204" fill="#58a6ff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" text-anchor="middle">+7h</text>
+<rect x="155" y="291" width="110" height="28" rx="14" fill="#58a6ff" fill-opacity="0.12"/>
+<text x="210.0" y="310" fill="#58a6ff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="middle">proceed</text>
+<circle cx="440" cy="154" r="8" fill="#0d1117"/>
+<circle cx="440" cy="154" r="5" fill="#e3b341"/>
+<text x="440" y="135" fill="#e3b341" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" text-anchor="middle">+8h</text>
+<rect x="385" y="291" width="110" height="28" rx="14" fill="#e3b341" fill-opacity="0.12"/>
+<text x="440.0" y="310" fill="#e3b341" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="middle">pause</text>
+<circle cx="730" cy="198" r="8" fill="#0d1117"/>
+<circle cx="730" cy="198" r="5" fill="#e3b341"/>
+<text x="730" y="179" fill="#e3b341" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" text-anchor="middle">+6h</text>
+<rect x="675" y="291" width="110" height="28" rx="14" fill="#e3b341" fill-opacity="0.12"/>
+<text x="730.0" y="310" fill="#e3b341" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="middle">still held</text>
+<circle cx="1010" cy="242" r="8" fill="#0d1117"/>
+<circle cx="1010" cy="242" r="5" fill="#56d364"/>
+<text x="1010" y="223" fill="#56d364" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" text-anchor="middle">+4h</text>
+<rect x="955" y="291" width="110" height="28" rx="14" fill="#56d364" fill-opacity="0.12"/>
+<text x="1010.0" y="310" fill="#56d364" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="middle">resume</text>
+<text x="210" y="342" fill="#9da7b3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" text-anchor="middle">No saved hold</text>
+<text x="440" y="342" fill="#9da7b3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" text-anchor="middle">Latch is set</text>
+<text x="730" y="342" fill="#9da7b3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" text-anchor="middle">Latch stays set</text>
+<text x="1010" y="342" fill="#9da7b3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" text-anchor="middle">Latch clears</text>
+<text x="737" y="107" fill="#e3b341" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="middle">WAITING: the +8 / +4 gap prevents rapid stop-start cycles</text>
+<text x="590" y="387" fill="#9da7b3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" text-anchor="middle">Schematic, not a time scale. Stale readings and reset changes differ by provider; see the rules below.</text>
+</svg>

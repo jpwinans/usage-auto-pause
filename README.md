@@ -40,16 +40,10 @@ ahead**. With no further spending, waiting 4.4 hours brings that lead down to
 +4 hours. Other sessions spending the same allowance push the resume time out.
 This is a flat weekly budget, not a prediction of your future work schedule.
 
-```mermaid
-flowchart LR
-  Q[Provider quota] --> C[Shared snapshot]
-  C --> M[Meters]
-  C --> G[Synchronous hook]
-  G --> R{Applicable hold?}
-  R -->|No| T[Pending operation runs]
-  R -->|Yes| W[Sleep locally and poll]
-  W --> G
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/flow-dark.svg">
+  <img alt="Provider quotas feed a shared snapshot, usage meters, and synchronous hooks that hold or resume pending work." src="assets/flow-light.svg" width="100%">
+</picture>
 
 ## Pause rules
 
@@ -63,6 +57,11 @@ flowchart LR
 
 The +8/+4 gap is hysteresis: it avoids rapid stop/start cycles near the trigger.
 These are the default rules. Claude also supports session-specific thresholds.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/hysteresis-dark.svg">
+  <img alt="Fresh weekly lead: +7h proceeds, +8h starts a hold, +6h stays held, and +4h resumes." src="assets/hysteresis-light.svg" width="100%">
+</picture>
 
 **The failure policies differ in the captured implementation:** Codex retains an
 established weekly hold through stale or missing readings until fresh weekly data

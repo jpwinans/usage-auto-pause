@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="590" viewBox="0 0 1180 590" role="img" aria-labelledby="title desc">
+<title id="title">From quota reading to automatic pause</title><desc id="desc">Quota readers feed a shared snapshot. Meters display it, while synchronous hooks evaluate applicable holds. No hold lets the pending operation run; a hold sleeps locally and rechecks.</desc>
+<defs>
+<marker id="arrow-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#9da7b3"/></marker>
+<marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#58a6ff"/></marker>
+<marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#bc8cff"/></marker>
+<marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#e3b341"/></marker>
+<marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#56d364"/></marker>
+</defs>
+<rect x="0.5" y="0.5" width="1179" height="589" rx="16" fill="#0d1117" fill-opacity="1" stroke="#30363d"/>
+<text x="32" y="43" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="24" font-weight="650" text-anchor="start">Read the quota. Hold the boundary. Resume the work.</text>
+<text x="32" y="72" fill="#9da7b3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">A shared usage snapshot connects the meters and the synchronous gates.</text>
+<rect x="32" y="110" width="252" height="220" rx="12" fill="#161b22" fill-opacity="1" stroke="#30363d"/>
+<rect x="32" y="110" width="252" height="4" rx="2" fill="#58a6ff" fill-opacity="1"/>
+<circle cx="60" cy="142" r="12" fill="#58a6ff"/>
+<text x="60" y="146" fill="#0d1117" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle">1</text>
+<text x="80" y="146" fill="#58a6ff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" text-anchor="start">READ USAGE</text>
+<text x="52" y="180" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="19" font-weight="650" text-anchor="start">Provider quota</text>
+<rect x="320" y="110" width="252" height="220" rx="12" fill="#161b22" fill-opacity="1" stroke="#30363d"/>
+<rect x="320" y="110" width="252" height="4" rx="2" fill="#bc8cff" fill-opacity="1"/>
+<circle cx="348" cy="142" r="12" fill="#bc8cff"/>
+<text x="348" y="146" fill="#0d1117" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle">2</text>
+<text x="368" y="146" fill="#bc8cff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" text-anchor="start">SHARE THE READING</text>
+<text x="340" y="180" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="19" font-weight="650" text-anchor="start">Shared snapshot</text>
+<rect x="608" y="110" width="252" height="220" rx="12" fill="#161b22" fill-opacity="1" stroke="#30363d"/>
+<rect x="608" y="110" width="252" height="4" rx="2" fill="#e3b341" fill-opacity="1"/>
+<circle cx="636" cy="142" r="12" fill="#e3b341"/>
+<text x="636" y="146" fill="#0d1117" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle">3</text>
+<text x="656" y="146" fill="#e3b341" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" text-anchor="start">CHECK THE RULES</text>
+<text x="628" y="180" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="19" font-weight="650" text-anchor="start">Applicable hold?</text>
+<rect x="896" y="110" width="252" height="220" rx="12" fill="#161b22" fill-opacity="1" stroke="#30363d"/>
+<rect x="896" y="110" width="252" height="4" rx="2" fill="#56d364" fill-opacity="1"/>
+<circle cx="924" cy="142" r="12" fill="#56d364"/>
+<text x="924" y="146" fill="#0d1117" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle">4</text>
+<text x="944" y="146" fill="#56d364" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" text-anchor="start">CONTINUE</text>
+<text x="916" y="180" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="19" font-weight="650" text-anchor="start">Pending work runs</text>
+<rect x="52" y="203" width="103" height="28" rx="14" fill="#e3b341" fill-opacity="0.12"/>
+<text x="103.5" y="222" fill="#e3b341" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Claude Code</text>
+<rect x="165" y="203" width="99" height="28" rx="14" fill="#58a6ff" fill-opacity="0.12"/>
+<text x="214.5" y="222" fill="#58a6ff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Codex</text>
+<text x="52" y="262" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">Usage % + reset time</text>
+<text x="52" y="292" fill="#9da7b3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" text-anchor="start">No model request</text>
+<text x="340" y="220" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">Reuse cached readings</text>
+<text x="340" y="248" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="400" text-anchor="start">Refresh when due</text>
+<text x="340" y="292" fill="#9da7b3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" text-anchor="start">Preserve freshness metadata</text>
+<text x="628" y="219" fill="#e6edf3" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" font-weight="400" text-anchor="start">Hard cutoff: &gt;98%</text>
+<text x="628" y="247" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" text-anchor="start">Weekly lead + hold state</text>
+<text x="628" y="292" fill="#9da7b3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" text-anchor="start">Match the calling model</text>
+<rect x="916" y="202" width="212" height="65" rx="8" fill="#0d1117" fill-opacity="1" stroke="#30363d"/>
+<text x="932" y="228" fill="#56d364" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="500" text-anchor="start">hook exits successfully</text>
+<text x="932" y="250" fill="#9da7b3" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" font-weight="400" text-anchor="start">operation continues</text>
+<text x="916" y="292" fill="#9da7b3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" text-anchor="start">No new prompt needed</text>
+<path d="M290 245 H314" fill="none" stroke="#9da7b3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-muted)"/>
+<path d="M578 245 H602" fill="none" stroke="#9da7b3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-muted)"/>
+<path d="M866 245 H890" fill="none" stroke="#9da7b3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-muted)"/>
+<text x="878" y="224" fill="#56d364" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" text-anchor="middle">no</text>
+<path d="M446 330 V433" fill="none" stroke="#bc8cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-purple)"/>
+<text x="458" y="386" fill="#bc8cff" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start">display path</text>
+<rect x="240" y="440" width="380" height="86" rx="12" fill="#161b22" fill-opacity="1" stroke="#30363d"/>
+<circle cx="266" cy="466" r="5" fill="#bc8cff"/>
+<text x="282" y="472" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" text-anchor="start">Usage meters</text>
+<text x="260" y="502" fill="#9da7b3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" text-anchor="start">Terminal · browser · macOS</text>
+<path d="M734 330 V433" fill="none" stroke="#e3b341" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-amber)"/>
+<text x="747" y="410" fill="#e3b341" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start">yes</text>
+<rect x="670" y="440" width="420" height="86" rx="12" fill="#161b22" fill-opacity="1" stroke="#30363d"/>
+<rect x="690" y="458" width="5" height="18" rx="1" fill="#e3b341" fill-opacity="1"/>
+<rect x="700" y="458" width="5" height="18" rx="1" fill="#e3b341" fill-opacity="1"/>
+<text x="718" y="474" fill="#e6edf3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="650" text-anchor="start">Sleep locally, then recheck</text>
+<text x="690" y="502" fill="#9da7b3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" text-anchor="start">Claude: 30s poll · Codex: 5s poll</text>
+<path d="M1090 483 H1153 V363 H820 V336" fill="none" stroke="#e3b341" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-amber)" stroke-dasharray="5 6"/>
+<text x="958" y="388" fill="#e3b341" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="middle">re-evaluate the hold</text>
+<text x="590" y="566" fill="#9da7b3" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" text-anchor="middle">Pauses apply at covered hook boundaries; already-running work is not frozen.</text>
+</svg>

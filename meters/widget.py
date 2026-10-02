@@ -25,14 +25,16 @@ def window_reading(data, minutes):
     ideal = pace.ideal(window, now)
     return {'used': window['used'], 'ideal': ideal,
             'leadHours': (window['used'] - ideal) / 100 * minutes / 60,
-            'resetsAt': window['reset'], 'stale': bool(data.get('error'))}
+            'resetsAt': window['reset'], 'stale': bool(data.get('error')) or data.get('complete') is False
+            or not 0 <= now-data.get('observed_at', 0) <= pace.MAX_AGE_SEC}
 
 
 def weekly_reading():
     """Use pace.py's shared cache and its existing Codex app-server reader."""
     data = pace.snapshot(pace.state_dir())
     bucket = dict(data.get('buckets', {}).get('codex') or {})
-    bucket['error'] = data.get('error')
+    bucket['error'] = data.get('error') or bucket.get('error')
+    bucket['observed_at'] = data.get('observed_at', 0)
     reading = window_reading(bucket, 10080)
     if reading is None:
         raise RuntimeError(data.get("error") or "Weekly Codex quota is not reported")
@@ -44,7 +46,7 @@ def claude_reading():
     session = claude_usage.active_session()
     result = {'windows':claude_readings(data,time.time()), 'problem':claude_usage.problem(data,time.time())}
     view = model_view(result,session.get('model'))
-    return dict(view['windows'], model=session.get('model'), session_key=session.get('session_key'), summary=view['summary'])
+    return dict(view['windows'], model=session.get('model'), summary=view['summary'])
 
 
 def demo_readings():
@@ -53,7 +55,7 @@ def demo_readings():
     def row(used, lead, hours):
         return {'used': used, 'ideal': used - lead / hours * 100,
                 'leadHours': lead, 'resetsAt': now + hours * 1800,
-                'stale': False}
+                'stale': False, 'label': '5H session' if hours == 5 else '7D weekly'}
     return {'codex': row(54, 6.72, 168),
             'claude': {'weekly': row(48, -3.36, 168),
                        'session': row(32, -0.9, 5),
@@ -63,6 +65,11 @@ def demo_readings():
 class WidgetHandler(BaseHTTPRequestHandler):
     demo = False
     def do_GET(self):
+        port = self.server.server_address[1]
+        host = self.headers.get('Host', '').lower()
+        if host not in (f'127.0.0.1:{port}', f'localhost:{port}'):
+            self.send_error(403, 'Local host required')
+            return
         if self.path in ("/", "/index.html"):
             body = (PROJECT / "index.html").read_bytes()
             if self.demo:

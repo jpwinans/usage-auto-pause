@@ -38,8 +38,8 @@ launching process's working directory; absolute paths are recommended.
 Codex state includes `limits.json`, `refresh.lock`, `hold.json`, `hold.lock`,
 `pace.log`, and optional `override`. Claude state includes `hold.json`, optional
 `hold-<trigger-minutes>-<resume-minutes>.json`, lock files, `pace.log`, `notified`,
-optional `override`, and `session-pace.json`. Legacy `limits.json`/`fetched` can
-provide fallback data. Shared Claude cache uses `claude-v2.json`/`.lock`, plus
+optional `override`, and `session-pace.json`. Legacy `limits.json` is read-only fallback input to the active reader;
+`fetched` belongs to the unused legacy fetch helper. Shared Claude cache uses `claude-v2.json`/`.lock`, plus
 session activity metadata. Tokens are not cached here; local session metadata
 and usage can still be private and are not intended for sharing.
 
@@ -66,5 +66,6 @@ Codex talks to its local app-server, which uses its existing signed-in account.
 Claude reads its OAuth access token from the macOS Keychain and sends it to
 `https://api.anthropic.com/api/oauth/usage` with the OAuth beta header. This is an
 implementation dependency, not a stable public API contract. Refresh-token
-rotation is deliberately left to Claude Code. HTTP backoff protects the endpoint
+rotation is deliberately left to Claude Code. Usage HTTP redirects are refused;
+the bearer token is never forwarded to a redirect target. HTTP backoff protects the endpoint
 from repeated retries. No external telemetry or judging service is added.

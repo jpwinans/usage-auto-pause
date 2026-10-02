@@ -1,6 +1,7 @@
 """Shared Claude quota snapshot for displays, statusline, and gates.
 
-Credentials stay in the existing hook's Keychain helper. Only quota data is cached.
+Credentials stay in the existing hook's Keychain helper. Quota readings and
+session activity metadata are cached; credentials are not.
 """
 import email.utils
 import fcntl
@@ -82,10 +83,25 @@ def for_model(data, model):
                               if applies(w.get('key', ''), model)])
 
 
+def valid_activity(data):
+    value = data.get('active_at') if isinstance(data, dict) else None
+    return (isinstance(value, (int, float)) and not isinstance(value, bool)
+            and math.isfinite(value) and value >= 0)
+
+
+class NoUsageRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None  # Never forward a usage bearer token to a redirect target.
+
+
+def open_usage(request, timeout):
+    return urllib.request.build_opener(NoUsageRedirect()).open(request, timeout=timeout)
+
+
 def active_session(directory=CACHE_DIR):
     try:
         data = json.loads((directory / 'active-session.json').read_text())
-        return data if isinstance(data, dict) and data.get('model') else {}
+        return data if valid_activity(data) and isinstance(data.get('model'), str) and data['model'] else {}
     except (OSError, ValueError):
         return {}
 
@@ -113,6 +129,8 @@ def record_session(payload, model, directory=CACHE_DIR):
         try:
             previous = json.loads(path.read_text())
         except (OSError, ValueError):
+            previous = {}
+        if not valid_activity(previous):
             previous = {}
         if previous and previous.get('model') != model:
             activity = now
@@ -200,7 +218,7 @@ def snapshot(directory=CACHE_DIR, refresh_sec=REFRESH_SEC, force=False):
             request = urllib.request.Request(source.USAGE_API, headers={
                 'Authorization': 'Bearer ' + token,
                 'anthropic-beta': 'oauth-2025-04-20'})
-            with urllib.request.urlopen(request, timeout=10) as response:
+            with open_usage(request, timeout=10) as response:
                 bucket = normalize(json.load(response), source.iso_epoch)
             if not bucket['complete']:
                 raise RuntimeError('Claude quota response incomplete')

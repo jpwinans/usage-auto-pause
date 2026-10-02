@@ -73,3 +73,13 @@ restart/resume affected sessions. Keep other hooks and footer preferences.
 Remove the checkout only after no installed command points at it. State lives
 under `${CODEX_HOME:-~/.codex}/usage-pacing` unless overridden; preserve it if
 another pacing installation uses it.
+
+## Partial responses and upgrades
+
+If a refresh omits a previously observed >98% window, the reader retains it as
+stale until its reset (bounded by the window duration) or a valid fresh replacement.
+Other buckets remain independent. A missing low-usage window does not suppress
+fresh weekly pacing. This protection requires every process writing the shared
+cache to use the updated reader; an older installed copy can overwrite it.
+Rebuild native bundles and update all installed script copies when deploying
+reader fixes. The example repository does not update installed gates automatically.

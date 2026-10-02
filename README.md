@@ -16,17 +16,17 @@ meters. Hooks sleep locally; quota polling makes no model requests.
 
 Actual native app capture with synthetic readings; no account data is shown.
 
-<img src="assets/meter-app.png" alt="Glassy upper semicircle Codex and Claude pacing gauges with red warnings and signed hour readings" width="360">
+<img src="assets/meter-app.jpg" alt="Glassy upper semicircle Codex and Claude pacing gauges with red warnings and signed hour readings" width="360">
 
 See the [design and contrast checks](docs/meter-design.md).
 
 ## Try it without an account
 
 ```sh
+python3 scripts/check.py
 python3 scripts/demo.py
 python3 meters/widget.py --demo
 # Open http://127.0.0.1:8765; Ctrl-C stops the server.
-python3 scripts/check.py
 ```
 
 The command-line demo replays the real rule engines against synthetic readings.
@@ -75,7 +75,9 @@ These are the default rules. Claude also supports session-specific thresholds.
 established weekly hold through stale or missing readings until fresh weekly data
 confirms release. Claude retains a stale weekly hold only while the last-known
 reading still projects at or above the trigger, with the same reset timestamp;
-it may let a call proceed sooner. Both retain a last-known >98% hard hold until
+it may let a call proceed sooner. A single failed refresh, HTTP backoff, or
+any quota window resetting can release a Claude hold in the +4h to +8h band.
+Both retain a last-known >98% hard hold until
 that reading's reset. See [the research notes](docs/research.md) for exact cases.
 
 ## Choose an integration
@@ -118,6 +120,7 @@ statusline expose more hold detail; the statusline also maintains Claude's latch
 - [Troubleshooting](docs/troubleshooting.md)
 - [Research, source trace, and behavior differences](docs/research.md)
 - [Configuration and state files](docs/configuration.md)
+- [Paired code audit and remaining limitations](docs/audit.md)
 - [Verification and portable packaging changes](docs/verification.md)
 - [Bundled implementation hashes](docs/source-manifest.json)
 

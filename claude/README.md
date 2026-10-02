@@ -8,7 +8,8 @@ not supported by this credential reader.
 
 ## Register the hook and statusline
 
-1. Keep the entire repository in a stable location.
+1. Run `python3 scripts/check.py` offline first, then keep the entire repository
+   in a stable location.
 2. Edit a copy of [settings.example.json](settings.example.json), replacing
    `/ABSOLUTE/PATH/usage-auto-pause` with the checkout's absolute path. Use an
    absolute Python executable if Claude's PATH differs from your shell.
@@ -16,7 +17,7 @@ not supported by this credential reader.
    hooks. Replace or combine your existing `statusLine` deliberately: Claude has
    one statusline command. Do not install a duplicate gate alongside an older copy.
 4. Reload/restart Claude and inspect `/hooks`. Make an ordinary tool request and
-   check the statusline. Test the rules offline first with `python3 scripts/check.py`.
+   check the statusline.
 
 The command stays synchronous. **Do not enable async execution.** Its seven-day
 configured timeout exceeds the script's six-day safety deadline. At that deadline
@@ -66,3 +67,21 @@ and statusline registration from Claude settings, then restart the affected
 sessions. Keep unrelated hooks. Once no process uses the checkout, it can be
 removed. Caches and logs may be retained or removed separately; don't delete a
 shared state directory while another installed pacing integration still uses it.
+
+## Failure-policy limits
+
+The captured Claude policy releases a latched weekly hold when stale data projects
+below +8h, even if it is still above the normal +4h release point. A single refresh
+failure, a 429 backoff, or **any** window in the snapshot passing its reset can
+cause this, including a window for another model. For example, a latched +6h
+reading can proceed during a failed refresh; a stale +9h reading falls below the
+trigger after about an hour rather than waiting about five hours to reach +4h.
+The latch file remains, so a later fresh +6h reading can hold again. This policy
+is intentionally preserved; it is less conservative than the Codex gate.
+
+Model discovery scans the last 1 MiB of the calling transcript. A large trailing
+entry can hide its latest assistant model; the conservative fallback checks all
+reported allowances. Malformed Claude state objects fall back to defaults, while
+Codex deliberately blocks on a corrupt hold file. Malformed Codex hook payloads
+also block unless its override is enabled; Claude uses unknown-model checks for
+a non-object payload.

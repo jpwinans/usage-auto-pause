@@ -64,9 +64,6 @@ class ClaudeUsageTests(unittest.TestCase):
         self.assertIn('+10.1h', result)
 
 
-if __name__ == '__main__':
-    unittest.main()
-
 class ActiveSessionTests(unittest.TestCase):
     def test_redraw_does_not_steal_activity_and_model_switch_updates_it(self):
         import os
@@ -97,7 +94,7 @@ class SharedSnapshotTests(unittest.TestCase):
         source=SimpleNamespace(read_limits=lambda:{},iso_epoch=lambda x:x,
                                keychain_token=lambda _: 'test-token',USAGE_API='https://example.invalid/usage')
         with tempfile.TemporaryDirectory() as tmp, patch.object(claude_usage,'helper',return_value=source), \
-             patch.object(claude_usage.urllib.request,'urlopen',return_value=io.StringIO(json.dumps(raw))) as fetch:
+             patch.object(claude_usage,'open_usage',return_value=io.StringIO(json.dumps(raw))) as fetch:
             first=claude_usage.snapshot(Path(tmp))
             second=claude_usage.snapshot(Path(tmp))
         self.assertEqual(first,second)
@@ -110,7 +107,7 @@ class SharedSnapshotTests(unittest.TestCase):
         source=SimpleNamespace(read_limits=lambda:{},iso_epoch=lambda x:x,
                                keychain_token=lambda _: 'test-token',USAGE_API='https://example.invalid/usage')
         with tempfile.TemporaryDirectory() as tmp, patch.object(claude_usage,'helper',return_value=source), \
-             patch.object(claude_usage.urllib.request,'urlopen',side_effect=HTTPError('https://example.invalid',429,'rate limited',{},None)) as fetch:
+             patch.object(claude_usage,'open_usage',side_effect=HTTPError('https://example.invalid',429,'rate limited',{},None)) as fetch:
             first=claude_usage.snapshot(Path(tmp))
             second=claude_usage.snapshot(Path(tmp),force=True)
         self.assertEqual(first,second)
@@ -122,7 +119,7 @@ class SharedSnapshotTests(unittest.TestCase):
         source=SimpleNamespace(read_limits=lambda:{},iso_epoch=lambda x:x,
                                keychain_token=lambda _: 'test-token',USAGE_API='https://example.invalid/usage')
         with tempfile.TemporaryDirectory() as tmp, patch.object(claude_usage,'helper',return_value=source), \
-             patch.object(claude_usage.urllib.request,'urlopen',side_effect=HTTPError('https://example.invalid',429,'rate limited',{'Retry-After':'120'},None)):
+             patch.object(claude_usage,'open_usage',side_effect=HTTPError('https://example.invalid',429,'rate limited',{'Retry-After':'120'},None)):
             data=claude_usage.snapshot(Path(tmp))
         self.assertAlmostEqual(data['retry_after']-data['checked_at'],120,delta=2)
         self.assertEqual(claude_usage.problem(data,data['checked_at']),'HTTP 429, retry 2m')
@@ -149,3 +146,7 @@ class RetryAfterTests(unittest.TestCase):
         self.assertEqual(claude_usage.problem(dict(ok,complete=False),now),'incomplete')
         self.assertEqual(claude_usage.problem(ok,now+300),'5m old')
         self.assertEqual(claude_usage.problem(dict(ok,observed_at=now+5000),now+5050),'reset passed')
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -34,8 +34,11 @@ Fable agent holds while an Opus agent keeps working.
 
 Escape hatch: touch ~/.claude/usage/override   (rm it to re-arm)
 Events log:   ~/.claude/usage/pace.log
+Stale Claude readings use a different policy: an established weekly hold can
+release below the +8h trigger before reaching the fresh +4h release point.
 """
 import json
+import math
 from pathlib import Path
 import fcntl
 import os
@@ -117,7 +120,7 @@ def session_pace(payload):
         lead, resume = float(entry["lead_hours"]) * 60, float(entry["resume_hours"]) * 60
     except (TypeError, KeyError, ValueError):
         return WEEKLY_LEAD_MIN, WEEKLY_LEAD_RESUME, HOLD
-    if not 0 <= resume < lead:
+    if not (math.isfinite(lead) and math.isfinite(resume) and 0 <= resume < lead):
         return WEEKLY_LEAD_MIN, WEEKLY_LEAD_RESUME, HOLD
     return lead, resume, os.path.join(USAGE_DIR, f"hold-{lead:g}-{resume:g}.json")
 
@@ -170,7 +173,7 @@ def _evaluate(limits, now, model, hold_path, persist, unavailable,
             continue
         held = (holds.get(key) or {}).get("resets_at") == resets
         if lead >= lead_min - 1e-7 or (held and lead > resume_min + 1e-7):
-            holds[key] = {"resets_at": resets, "since": holds[key]["since"] if held else now}
+            holds[key] = {"resets_at": resets, "since": holds[key].get("since", now) if held else now}
         else:
             holds.pop(key, None)
         if used > HARD_PCT:                             # beats a lead hold, which stays recorded
@@ -186,7 +189,8 @@ def _evaluate(limits, now, model, hold_path, persist, unavailable,
 def read_json(path):
     try:
         with open(path) as f:
-            return json.load(f)
+            data = json.load(f)
+            return data if isinstance(data, dict) else {}
     except (OSError, ValueError):
         return {}
 
@@ -247,6 +251,14 @@ def keychain_token(now):
     return c.get("accessToken") if c.get("expiresAt", 0) / 1000 > now + 60 else None
 
 
+def open_usage(request, timeout):
+    source_dir = str(Path(__file__).resolve().parents[1] / 'codex')
+    if source_dir not in sys.path:
+        sys.path.append(source_dir)
+    import claude_usage
+    return claude_usage.open_usage(request, timeout)
+
+
 def fetch_usage(now, stamp=STAMP):
     """The account's usage response, or {} — at most once per FETCH_EVERY
     across every session. The statusline payload carries only five_hour and
@@ -266,7 +278,7 @@ def fetch_usage(now, stamp=STAMP):
     req = urllib.request.Request(USAGE_API, headers={"Authorization": f"Bearer {token}",
                                                      "anthropic-beta": "oauth-2025-04-20"})
     try:
-        with urllib.request.urlopen(req, timeout=3) as r:
+        with open_usage(req, timeout=3) as r:
             return json.load(r)
     except (OSError, ValueError):               # URLError, HTTPError and timeouts are OSErrors
         return {}
@@ -312,7 +324,9 @@ def notify(key, text):
     try:
         with open(NOTIFIED, "w") as f:
             f.write(key)
-        subprocess.run(["osascript", "-e", f'display notification "{text}" with title "Claude pacing"'],
+        subprocess.run(["osascript", "-e", 'on run argv',
+                        "-e", 'display notification (item 1 of argv) with title "Claude pacing"',
+                        "-e", 'end run', "--", text],
                        capture_output=True, timeout=5)
     except (OSError, subprocess.SubprocessError):
         pass
@@ -659,8 +673,8 @@ def selftest():
 if __name__ == "__main__":
     try:
         {"statusline": statusline, "gate": gate, "selftest": selftest}[sys.argv[1]]()
-    except Exception:
+    except Exception as exc:
         if len(sys.argv) > 1 and sys.argv[1] == 'gate':
-            print('Usage gate unavailable; blocking until quota checks recover.', file=sys.stderr)
+            print(f'Usage gate failed ({type(exc).__name__}); pending call blocked. Check local state and configuration before retrying.', file=sys.stderr)
             sys.exit(2)
         raise

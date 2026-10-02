@@ -25,7 +25,7 @@ def reading(bucket, minutes, now, key=None):
     ideal = pace.ideal(window, now)
     observed = bucket.get('observed_at', 0)
     return dict(used=used, leadHours=(used-ideal)/100*minutes/60,
-                resetsAt=window['reset'], stale=bool(bucket.get('error')) or not 0 <= now-observed <= DISPLAY_MAX_AGE,
+                resetsAt=window['reset'], stale=bool(bucket.get('error')) or bucket.get('complete') is False or not 0 <= now-observed <= DISPLAY_MAX_AGE,
                 observedAt=observed, label=window.get('label') or ('7D weekly' if minutes == 10080 else '5H session'))
 
 
@@ -82,7 +82,7 @@ def fetch_provider(provider):
         if provider == 'Codex':
             data = pace.snapshot(pace.state_dir(), refresh_sec=REFRESH_SECONDS)
             bucket = dict(data.get('buckets', {}).get('codex') or {})
-            bucket.update(error=data.get('error'), observed_at=data.get('observed_at', 0))
+            bucket.update(error=data.get('error') or bucket.get('error'), observed_at=data.get('observed_at', 0))
             result = {'weekly': reading(bucket, 10080, time.time())}
             for w in bucket.get('windows', []):
                 if w['minutes'] != 10080:

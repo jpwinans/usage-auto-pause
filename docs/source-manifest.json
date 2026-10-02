@@ -5,11 +5,11 @@
   },
   {
     "file": "codex/pace.py",
-    "sha256": "1cdc00ecd6ed78ba1fe4b9769c7416a0ffa42cbc0caf3b87d1b6d2183713c6d9"
+    "sha256": "b93c0b1c3cb0db68bb37b1e7a85f3d9207c0ae1ea77b5e4acd0e59d9d0428248"
   },
   {
     "file": "codex/test_claude_usage.py",
-    "sha256": "b3c8154e7610230f20be23bf40708b2a2e59cd0495dc98a0ce634e48d6eff3a3"
+    "sha256": "78c059fe0f6c626599ee424b2315b179f10d68c8637bd43efbbd0e4a133cca00"
   },
   {
     "file": "codex/test_pace.py",
@@ -25,11 +25,11 @@
   },
   {
     "file": "codex/claude_usage.py",
-    "sha256": "675977259bb60e6c73c9eed0e31b51b30a8887b0151a2af7ee91c6614af6af71"
+    "sha256": "99c78989c60e7c2ee5da4af3b32deea355d33ae2ba2d1ce18722b6f8aec44747"
   },
   {
     "file": "claude/pace.py",
-    "sha256": "440f22dab61cc8be65f2239e2fc70bbe8204a43950036f541264b93563a5738e"
+    "sha256": "74f37b7069865d3499f1cb65a553c14106f4a7e4a5a29ad2cdabe9eacad5ee93"
   },
   {
     "file": "claude/test_pace_model_switch.py",
@@ -37,11 +37,11 @@
   },
   {
     "file": "meters/widget.py",
-    "sha256": "34d00240d2cbb2429aed941b3966038761c7a3722c7e553deef2b7a96b7eafa4"
+    "sha256": "834c1b70a00a79197e7008afde9e2f5f7a8041b827ff007889d4cb8ad2e7f985"
   },
   {
     "file": "meters/native_data.py",
-    "sha256": "c2419d82f11fd958d80f0582656d5d986e43e539ceb0ab40449f4896f9d7f829"
+    "sha256": "1a74cef4d955c2989864d2306f2f235c69be60012695e05e6b497e4fd56f0bc1"
   },
   {
     "file": "meters/native_app.py",
@@ -70,5 +70,9 @@
   {
     "file": "meters/assets/LLMPacing.icns",
     "sha256": "d551ebabe31be6770c9495beecae660902b6bc1c61c9539277ebd1756d31c114"
+  },
+  {
+    "file": "codex/test_audit_regressions.py",
+    "sha256": "62adbe1622599c1ded6e282e827aea7c78cfcd82732da4e7880cd4c3cc97a197"
   }
 ]

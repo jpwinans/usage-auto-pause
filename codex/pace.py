@@ -128,18 +128,49 @@ def atomic_json(path, data):
             os.unlink(name)
 
 
+def retain_missing_hard_windows(previous, current, now):
+    """A partial response is not evidence of headroom in a known hard window.
+
+    Retain only missing >98% windows, bounded by their own duration/reset. Low
+    omitted windows must not prevent a fresh weekly reading from starting a hold.
+    Bucket-local incompleteness leaves unrelated buckets usable.
+    """
+    for key, old in previous.items():
+        if not isinstance(old, dict) or not isinstance(old.get('windows'), list):
+            continue
+        fresh = current.get(key, {})
+        durations = {w['minutes'] for w in fresh.get('windows', [])}
+        retained = []
+        for w in old['windows']:
+            if not isinstance(w, dict):
+                continue
+            values = [w.get(field) for field in ('used', 'minutes', 'reset')]
+            if not all(isinstance(v, (int, float)) and not isinstance(v, bool)
+                       and math.isfinite(v) for v in values):
+                continue
+            used, minutes, reset = values
+            if (minutes > 0 and minutes not in durations and HARD_PCT < used <= 100
+                    and 0 < reset - now <= minutes * 60):
+                retained.append(w)
+        if retained:
+            current[key] = dict(fresh or old, windows=fresh.get('windows', []) + retained,
+                                complete=False, error='Previously exhausted quota missing from refresh')
+    return current
+
+
 def snapshot(directory, force=False, refresh_sec=REFRESH_SEC):
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     # Serialize refreshes across all sessions. Readers cannot see partial JSON.
     with (directory / "refresh.lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         data = read_cache(directory)
-        if not force and time.time() - data["checked_at"] < refresh_sec:
+        if not force and 0 <= time.time() - data["checked_at"] < refresh_sec:
             return data
         try:
             buckets = normalize(rpc())
             if not buckets or not any(b["windows"] for b in buckets.values()):
                 raise RuntimeError("Codex returned no usable quota windows")
+            buckets = retain_missing_hard_windows(data.get("buckets", {}), buckets, time.time())
             data = {"buckets": buckets, "observed_at": time.time(),
                     "checked_at": time.time(), "error": None}
         except (OSError, ValueError, RuntimeError, TimeoutError) as exc:
@@ -250,6 +281,17 @@ def fmt_time(epoch):
 def render(data, bucket="codex", now=None, color=False, override=False, directory=None):
     now = time.time() if now is None else now
     windows = (data.get("buckets", {}).get(bucket) or {}).get("windows", [])
+    selected = data.get('buckets', {}).get(bucket) or {}
+    observed = data.get('observed_at', selected.get('observed_at'))
+    problem = data.get('error') or selected.get('error')
+    if not problem and selected.get('complete') is False:
+        problem = 'incomplete quota response'
+    if not problem and bucket == 'claude' and 'schema' in selected and selected['schema'] != claude_usage.SCHEMA:
+        problem = 'incompatible quota cache'
+    if not problem and observed is not None and not 0 <= now-observed <= METER_REFRESH_SEC+60:
+        problem = 'reading too old or clock skew'
+    if not problem and any(w['reset'] <= now for w in windows):
+        problem = 'quota reset passed'
     parts = [bucket + (f" ({data.get('model', 'all reported allowances')})" if bucket == 'claude' else '')]
     if not windows:
         parts.append("7D weekly: not reported")
@@ -273,22 +315,20 @@ def render(data, bucket="codex", now=None, color=False, override=False, director
     if bucket == 'claude':
         helper = claude_usage.helper()
         limits = claude_usage.as_limits({'windows':windows})
-        pause = (helper.stale_pause(limits, now, data.get('model')) if data.get('error')
+        pause = (helper.stale_pause(limits, now, data.get('model')) if problem
                  else helper.evaluate(limits, now, data.get('model'), persist=False))
     else:
-        unavailable = (bool(data.get('error'))
-                       or (data.get('buckets', {}).get(bucket) or {}).get('complete') is False
-                       or ('observed_at' in data and not 0 <= now - data['observed_at'] <= MAX_AGE_SEC)
-                       or any(w['reset'] <= now for w in windows))
+        unavailable = bool(problem)
         pause = weekly_pause(state_dir() if directory is None else directory,
                              bucket, windows, now, unavailable=unavailable, persist=False)
     if pause:
         parts.append(f"⏸ {pause[2]}; resume {fmt_time(pause[0])}")
     if override:
         parts.append("OVERRIDE: gate disabled")
-    if data.get("error"):
-        age = max(0, now - data.get("observed_at", now))
-        parts.append(f"STALE ({age / 60:.0f}m): {data['error']}")
+    if problem:
+        parts.append(f"STALE: {problem}")
+    elif observed is not None and now-observed > MAX_AGE_SEC:
+        parts.append(f"reading {now-observed:.0f}s old; hold estimate")
     return " | ".join(parts)
 
 
@@ -299,6 +339,10 @@ def log(directory, message):
 
 def gate(directory, payload, get_snapshot=snapshot, sleep=time.sleep,
          wall=time.time, monotonic=time.monotonic):
+    if (directory / "override").exists():
+        return
+    if not isinstance(payload, dict) or not isinstance(payload.get('model', ''), str):
+        raise ValueError('Invalid hook payload: expected an object with an optional string model')
     bucket = bucket_for(payload.get("model", ""))
     event = payload.get("hook_event_name", "PreToolUse")
     started, held = monotonic(), None

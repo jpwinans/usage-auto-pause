@@ -4,7 +4,7 @@
 
 Actual native app capture with synthetic readings; no account data is shown.
 
-<img src="../assets/meter-app.png" alt="Glassy upper semicircle Codex and Claude pacing gauges with red warnings and signed hour readings" width="360">
+<img src="../assets/meter-app.jpg" alt="Glassy upper semicircle Codex and Claude pacing gauges with red warnings and signed hour readings" width="360">
 
 See the [design and contrast checks](../docs/meter-design.md).
 
@@ -94,3 +94,9 @@ expired, stale, weekly hold, hard cutoff, behind pace, and on-pace states
 (Cmd-1 through Cmd-9). Cmd-minus selects the minimum size, Cmd-equals restores
 the default, and Cmd-0 selects a wide window. Try both allowance and period
 selectors. Demo mode does not read account data or save display preferences.
+
+Terminal hold estimates use the display's 360-second freshness budget and show an
+age note after 90 seconds. A gate requests fresher readings, so an estimate is not
+proof of its current state. Incomplete, expired, failed, or older readings are
+marked `STALE`. Browser requests require `localhost:<port>` or
+`127.0.0.1:<port>`; reverse-proxy hostnames are intentionally rejected.

@@ -15,8 +15,8 @@ python3 meters/widget.py --demo --once
 The check runner parses Python syntax and runs the three unittest suites in
 separate processes, with temporary Claude/Codex/cache state. Provider calls and
 clock waits in those tests use fixtures or mocks. It also runs Claude's built-in
-rule selftest. On Python 3.11, **64 tests pass** (49 shared/Codex, 4 Claude model
-switch, 11 meter/demo), plus the selftest.
+rule selftest. On Python 3.9 and 3.11, **84 tests pass** (64 shared/Codex, 4 Claude model
+switch, 16 meter/demo), plus the selftest.
 
 Covered behavior includes strict >98%, +8/+4 hysteresis, bucket/model separation,
 concurrent hold writers, separate-process latch persistence, reset changes,
@@ -51,6 +51,15 @@ were exercised by this verification.
 - Supplied redacted configuration templates instead of user settings, trust
   hashes, caches, credentials, or logs.
 
-The quota math, trigger/release thresholds, provider failure policies, polling,
-and live credential mechanisms are preserved. This repository does not install
+The quota math, trigger/release thresholds, Claude stale policy, polling,
+and live credential mechanisms are preserved. The paired audit added Codex
+partial-response retention, display freshness checks and input/transport
+hardening; see [the audit report](audit.md). This repository does not install
 or replace the user's currently running hooks automatically.
+
+The final paired review also exercised real loopback redirect and widget servers,
+confirmed that no redirect target received a request, and ran both test versions
+under a network/process guard (zero DNS lookups or network connects in the suite).
+A fresh py2app build of the corrected public source succeeded in an isolated copy.
+The last review regression—malformed old Codex cache entries preventing recovery—
+was corrected and covered before publication.

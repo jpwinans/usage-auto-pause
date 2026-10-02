@@ -15,3 +15,21 @@ limits.json
 hold*.json
 override
 claude-v2.json
+
+# Keep private inputs and local installations out of public commits.
+*.jsonl
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*
+auth.json
+settings.json
+hooks.json
+config.toml
+.claude/
+.codex/
+.cache/
+active-session.json
+session-pace.json
+sessions/

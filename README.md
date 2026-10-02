@@ -5,6 +5,8 @@
 [![Claude Code](https://img.shields.io/badge/Claude-Code-D97757.svg)](claude/README.md)
 [![Codex](https://img.shields.io/badge/Codex-111111.svg)](codex/README.md)
 
+<img src="assets/usage-pacing-cover.png" alt="Claude and Codex gauges inside a repeating Create PR, Evaluate, Merge loop beneath Keep the loop running" width="100%">
+
 Spread subscription usage across the week, see how far ahead of pace you are,
 and automatically wait at tool boundaries when you burn too quickly.
 
@@ -12,13 +14,8 @@ This example repo collects the actual Claude and Codex pacing implementations,
 shared quota readers, terminal batteries, browser instruments, and native macOS
 meters. Hooks sleep locally; quota polling makes no model requests.
 
-## Meter preview
-
-Actual native app capture with synthetic readings; no account data is shown.
-
-<img src="assets/meter-app.jpg" alt="Glassy upper semicircle Codex and Claude pacing gauges with red warnings and signed hour readings" width="360">
-
-See the [design and contrast checks](docs/meter-design.md).
+See the [native meter preview](meters/README.md) and
+[design and contrast checks](docs/meter-design.md).
 
 ## Try it without an account
 

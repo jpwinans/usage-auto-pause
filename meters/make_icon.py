@@ -38,7 +38,24 @@ def render(size, destination):
     tile.setLineWidth_(3)
     tile.stroke()
     cx, cy, radius = 512, 359, 310
-    for start, end, tint in [(0, .75, '70dc99'), (.75, .875, 'f7ce62'), (.875, 1, 'ff5148')]:
+    # Glass lens follows the upright dial, with a restrained reflection.
+    lens = NSBezierPath.bezierPath()
+    lens.moveToPoint_((cx-355, cy-12))
+    for i in range(121):
+        angle = math.pi * (1-i/120)
+        lens.lineToPoint_((cx+355*math.cos(angle), cy+355*math.sin(angle)))
+    lens.lineToPoint_((cx+355, cy-12))
+    lens.closePath()
+    NSGradient.alloc().initWithStartingColor_endingColor_(color('101916'), color('304a3e')).drawInBezierPath_angle_(lens, 90)
+    color('526d60').setStroke()
+    lens.setLineWidth_(4)
+    lens.stroke()
+    NSGraphicsContext.saveGraphicsState()
+    lens.addClip()
+    NSColor.colorWithCalibratedRed_green_blue_alpha_(.88, 1, .94, .09).setFill()
+    NSBezierPath.bezierPathWithOvalInRect_(((150, 500), (780, 340))).fill()
+    NSGraphicsContext.restoreGraphicsState()
+    for start, end, tint in [(0, .75, '68d58b'), (.75, .875, 'f3c54f'), (.875, 1, 'ff5148')]:
         arc = NSBezierPath.bezierPath()
         for i in range(121):
             angle = math.pi * (1 - start - (end-start)*i/120)
@@ -47,7 +64,15 @@ def render(size, destination):
         color(tint).setStroke()
         arc.setLineWidth_(68)
         arc.stroke()
-    disc(cx-radius, cy, 34, '70dc99')
+    for i in range(17):
+        angle = math.pi*(1-i/16)
+        tick = NSBezierPath.bezierPath()
+        tick.moveToPoint_((cx+259*math.cos(angle), cy+259*math.sin(angle)))
+        tick.lineToPoint_((cx+280*math.cos(angle), cy+280*math.sin(angle)))
+        color('adc1b5').setStroke()
+        tick.setLineWidth_(5 if i%4 == 0 else 3)
+        tick.stroke()
+    disc(cx-radius, cy, 34, '68d58b')
     disc(cx+radius, cy, 34, 'ff5148')
 
     dx, dy = -.48, .877
@@ -59,7 +84,8 @@ def render(size, destination):
     color('f4fff7').setFill()
     needle.fill()
     disc(cx, cy, 38, '14281e')
-    disc(cx, cy, 27, '809e8b')
+    hub = NSBezierPath.bezierPathWithOvalInRect_(((cx-27, cy-27), (54, 54)))
+    NSGradient.alloc().initWithStartingColor_endingColor_(color('43594b'), color('dbe9df')).drawInBezierPath_angle_(hub, 110)
     disc(cx, cy, 17, 'e2f4e8')
     NSGraphicsContext.restoreGraphicsState()
     bitmap.representationUsingType_properties_(NSPNGFileType, {}).writeToFile_atomically_(str(destination), True)

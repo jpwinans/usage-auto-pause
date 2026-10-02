@@ -65,10 +65,10 @@
   },
   {
     "file": "meters/make_icon.py",
-    "sha256": "268c954d86ab84fdb1e19d84ffde1d62335465689ec56da609a3b5a648a90d8f"
+    "sha256": "41a443d89105fde7e2a8fb8fa0a287e8727e3da4b095b5d2190a57453970f56e"
   },
   {
     "file": "meters/assets/LLMPacing.icns",
-    "sha256": "3ad3dd22e85ab9cad52a66ca98eb04e422c5d69f058240f78bb4f372fe50bc94"
+    "sha256": "d551ebabe31be6770c9495beecae660902b6bc1c61c9539277ebd1756d31c114"
   }
 ]

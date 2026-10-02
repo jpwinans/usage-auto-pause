@@ -2,6 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org)
+[![Claude Code](https://img.shields.io/badge/Claude-Code-D97757.svg)](claude/README.md)
+[![Codex](https://img.shields.io/badge/Codex-111111.svg)](codex/README.md)
 
 Spread subscription usage across the week, see how far ahead of pace you are,
 and automatically wait at tool boundaries when you burn too quickly.

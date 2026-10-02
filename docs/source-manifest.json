@@ -1,0 +1,74 @@
+[
+  {
+    "file": "codex/test_safety.py",
+    "sha256": "2a7693c30c7682f22bb63b2d753eb2ca2ea6c05f87e6de1cc31bb3a1c13c73e4"
+  },
+  {
+    "file": "codex/pace.py",
+    "sha256": "1cdc00ecd6ed78ba1fe4b9769c7416a0ffa42cbc0caf3b87d1b6d2183713c6d9"
+  },
+  {
+    "file": "codex/test_claude_usage.py",
+    "sha256": "b3c8154e7610230f20be23bf40708b2a2e59cd0495dc98a0ce634e48d6eff3a3"
+  },
+  {
+    "file": "codex/test_pace.py",
+    "sha256": "2d3552fde87acc85551fbd9032b50024c06c61a53d353c769d6ffe20ab1daf84"
+  },
+  {
+    "file": "codex/test_hysteresis.py",
+    "sha256": "799bcea18d4a7ffa094e23c953a3d8871e0b0695d236720933f1e8204a7db6b1"
+  },
+  {
+    "file": "codex/test_codex_latch_regression.py",
+    "sha256": "fd7b420fafaf18d0081cce51343b3aef130271cf645fdd85d09d9fb1db245a9d"
+  },
+  {
+    "file": "codex/claude_usage.py",
+    "sha256": "675977259bb60e6c73c9eed0e31b51b30a8887b0151a2af7ee91c6614af6af71"
+  },
+  {
+    "file": "claude/pace.py",
+    "sha256": "440f22dab61cc8be65f2239e2fc70bbe8204a43950036f541264b93563a5738e"
+  },
+  {
+    "file": "claude/test_pace_model_switch.py",
+    "sha256": "f4039b9a42156213baa618be655937ba7d70bebc0b02070e26e837d7b372cd7c"
+  },
+  {
+    "file": "meters/widget.py",
+    "sha256": "34d00240d2cbb2429aed941b3966038761c7a3722c7e553deef2b7a96b7eafa4"
+  },
+  {
+    "file": "meters/native_data.py",
+    "sha256": "55db92624765088dd4d7da8898cb7ecba3d24e0c73c6dd03e8acadf9609e656b"
+  },
+  {
+    "file": "meters/native_app.py",
+    "sha256": "323a3b39b0a84db84f7aff48bc2ef2b0026740af0076ca7f820a341e24b2aa73"
+  },
+  {
+    "file": "meters/setup.py",
+    "sha256": "bece852ca1623e56a966ea11fee719d04ec5cb47daabf3030bf5b9b8335fdeb3"
+  },
+  {
+    "file": "meters/requirements-native.txt",
+    "sha256": "576526f43259c3691c5859ed405f68f9cdcf1a9d65db76a87b7574cc71ab4f75"
+  },
+  {
+    "file": "meters/test_native_data.py",
+    "sha256": "8457c373d7fda1ce2222d3781bd7759662d88ebc96e253aa052f8d0d5dc81bab"
+  },
+  {
+    "file": "meters/index.html",
+    "sha256": "e0419fe413b60f1e675e02fbf820f02b4994dea31ba753d5a3095482383aa387"
+  },
+  {
+    "file": "meters/make_icon.py",
+    "sha256": "0120a8581333ae8fe6844b8bfe44328ee5d8c538d89bcd64262f1a464ebbdf9d"
+  },
+  {
+    "file": "meters/assets/LLMPacing.icns",
+    "sha256": "1da34dc902ef6590e47875d8976345064cf7beb3c77affb50d5e539fa7b63061"
+  }
+]

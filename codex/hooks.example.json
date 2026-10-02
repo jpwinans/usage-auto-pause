@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"/ABSOLUTE/PATH/usage-auto-pause/codex/pace.py\" gate",
+            "timeout": 691200
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"/ABSOLUTE/PATH/usage-auto-pause/codex/pace.py\" gate",
+            "timeout": 691200
+          }
+        ]
+      }
+    ]
+  }
+}

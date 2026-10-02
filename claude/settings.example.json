@@ -1,0 +1,21 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"/ABSOLUTE/PATH/usage-auto-pause/claude/pace.py\" gate",
+            "timeout": 604800
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "python3 \"/ABSOLUTE/PATH/usage-auto-pause/claude/pace.py\" statusline",
+    "padding": 1,
+    "refreshInterval": 60
+  }
+}

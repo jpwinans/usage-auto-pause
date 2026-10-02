@@ -12,6 +12,14 @@ This example repo collects the actual Claude and Codex pacing implementations,
 shared quota readers, terminal batteries, browser instruments, and native macOS
 meters. Hooks sleep locally; quota polling makes no model requests.
 
+## Meter preview
+
+Actual native app capture with synthetic readings; no account data is shown.
+
+<img src="assets/meter-app.png" alt="Glassy upper semicircle Codex and Claude pacing gauges with red warnings and signed hour readings" width="360">
+
+See the [design and contrast checks](docs/meter-design.md).
+
 ## Try it without an account
 
 ```sh

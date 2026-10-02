@@ -37,20 +37,20 @@ def render(size, destination):
     color('4a6053').setStroke()
     tile.setLineWidth_(3)
     tile.stroke()
-    cx, cy, radius = 512, 665, 310
-    for start, end, tint in [(0, .75, '70dc99'), (.75, .875, 'f7ce62'), (.875, 1, 'fa7b68')]:
+    cx, cy, radius = 512, 359, 310
+    for start, end, tint in [(0, .75, '70dc99'), (.75, .875, 'f7ce62'), (.875, 1, 'ff5148')]:
         arc = NSBezierPath.bezierPath()
         for i in range(121):
             angle = math.pi * (1 - start - (end-start)*i/120)
-            point = (cx+radius*math.cos(angle), cy-radius*math.sin(angle))
+            point = (cx+radius*math.cos(angle), cy+radius*math.sin(angle))
             (arc.moveToPoint_ if i == 0 else arc.lineToPoint_)(point)
         color(tint).setStroke()
         arc.setLineWidth_(68)
         arc.stroke()
     disc(cx-radius, cy, 34, '70dc99')
-    disc(cx+radius, cy, 34, 'fa7b68')
+    disc(cx+radius, cy, 34, 'ff5148')
 
-    dx, dy = -.48, -.877
+    dx, dy = -.48, .877
     needle = NSBezierPath.bezierPath()
     needle.moveToPoint_((cx-16*dy, cy+16*dx))
     needle.lineToPoint_((cx+260*dx, cy+260*dy))

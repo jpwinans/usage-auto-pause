@@ -1,5 +1,6 @@
 """Native AppKit pacing instruments. Run directly or build with py2app."""
 import math
+import sys
 import os
 from pathlib import Path
 import threading
@@ -10,7 +11,7 @@ from AppKit import (
     NSApplication, NSApplicationActivationPolicyRegular, NSAppearance,
     NSAppearanceNameDarkAqua, NSBackingStoreBuffered, NSBezierPath,
     NSColor, NSFont, NSFontAttributeName, NSForegroundColorAttributeName,
-    NSGradient, NSMakeRect, NSMenu, NSMenuItem, NSRectFill,
+    NSGradient, NSGraphicsContext, NSMakeRect, NSMenu, NSMenuItem, NSRectFill,
     NSSegmentedControl, NSSegmentStyleRounded, NSView, NSWindow,
     NSWindowStyleMaskTitled, NSWindowStyleMaskClosable,
     NSWindowStyleMaskMiniaturizable, NSWindowStyleMaskResizable,
@@ -18,7 +19,7 @@ from AppKit import (
 )
 from Foundation import NSObject, NSString, NSTimer, NSUserDefaults
 from PyObjCTools import AppHelper
-from native_data import REFRESH_SECONDS, DISPLAY_MAX_AGE, fetch_provider, allowance_view
+from native_data import REFRESH_SECONDS, DISPLAY_MAX_AGE, fetch_provider, allowance_view, demo_provider
 
 # Finder does not inherit a shell's PATH. The Codex reader needs the CLI that
 # the terminal command already uses; never launch a login shell for credentials.
@@ -26,17 +27,18 @@ os.environ['PATH'] = ':'.join(dict.fromkeys([
     str(Path.home()/'.local/bin'), '/opt/homebrew/bin', '/usr/local/bin',
     '/opt/local/bin', '/usr/bin', '/bin', *os.environ.get('PATH', '').split(':')]))
 
+DEMO = '--demo' in sys.argv
 WIDTH, HEIGHT = 396, 790
-GREEN, YELLOW, RED = '#68d58b', '#f3c54f', '#f06555'
+GREEN, YELLOW, RED = '#68d58b', '#f3c54f', '#ff5148'
 
 
-def color(hex_value):
+def color(hex_value, alpha=1):
     value = hex_value.lstrip('#')
     return NSColor.colorWithCalibratedRed_green_blue_alpha_(
-        int(value[0:2],16)/255, int(value[2:4],16)/255, int(value[4:6],16)/255, 1)
+        int(value[0:2],16)/255, int(value[2:4],16)/255, int(value[4:6],16)/255, alpha)
 
 
-def text(value, x, baseline, size=7, tint='#93a098', mono=True):
+def text(value, x, baseline, size=9, tint='#c3d1c9', mono=True):
     font = (NSFont.monospacedSystemFontOfSize_weight_(size, .3) if mono
             else NSFont.systemFontOfSize_weight_(size, .3))
     attrs = {NSFontAttributeName: font, NSForegroundColorAttributeName: color(tint)}
@@ -62,7 +64,7 @@ def line(a, b, tint, width=1):
 def position(hours, radius=105):
     fraction = (max(-8, min(8, hours))+8)/16
     angle = math.pi*(1-fraction)
-    return radius*math.cos(angle), radius*math.sin(angle)
+    return radius*math.cos(angle), -radius*math.sin(angle)
 
 
 class MeterView(NSView):
@@ -72,9 +74,9 @@ class MeterView(NSView):
             return None
         self.results = {}
         self.owner = None
-        self.period = NSUserDefaults.standardUserDefaults().stringForKey_('ClaudeWindow') or 'weekly'
+        self.period = 'weekly' if DEMO else NSUserDefaults.standardUserDefaults().stringForKey_('ClaudeWindow') or 'weekly'
         self.period_keys = ['session', 'weekly']
-        saved = NSUserDefaults.standardUserDefaults().stringForKey_('ClaudeAllowance')
+        saved = None if DEMO else NSUserDefaults.standardUserDefaults().stringForKey_('ClaudeAllowance')
         self.allowance = saved if saved in ('all', 'fable') else 'all'
         self.switch = NSSegmentedControl.alloc().initWithFrame_(NSMakeRect(48, 739, 300, 27))
         self.switch.setSegmentCount_(2)
@@ -117,12 +119,14 @@ class MeterView(NSView):
 
     def changeWindow_(self, sender):
         self.period = self.period_keys[sender.selectedSegment()]
-        NSUserDefaults.standardUserDefaults().setObject_forKey_(self.period,'ClaudeWindow')
+        if not DEMO:
+            NSUserDefaults.standardUserDefaults().setObject_forKey_(self.period,'ClaudeWindow')
         self.setNeedsDisplay_(True)
 
     def changeAllowance_(self, sender):
         self.allowance = 'fable' if sender.selectedSegment() == 1 else 'all'
-        NSUserDefaults.standardUserDefaults().setObject_forKey_(self.allowance,'ClaudeAllowance')
+        if not DEMO:
+            NSUserDefaults.standardUserDefaults().setObject_forKey_(self.allowance,'ClaudeAllowance')
         self.setNeedsDisplay_(True)
 
     @objc.python_method
@@ -146,14 +150,45 @@ class MeterView(NSView):
         x = 20
         frame = NSMakeRect(x,y,356,height)
         case = NSBezierPath.bezierPathWithRoundedRect_xRadius_yRadius_(frame,23,23)
-        NSGradient.alloc().initWithStartingColor_endingColor_(color('#1b241f'),color('#131916')).drawInBezierPath_angle_(case,90)
-        color('#34423a').setStroke()
+        NSGradient.alloc().initWithStartingColor_endingColor_(color('#283a34'),color('#101916')).drawInBezierPath_angle_(case,90)
+        color('#7c9b8e', .48).setStroke()
         case.setLineWidth_(1)
         case.stroke()
+        # A broad reflection is clipped to the glass case, behind all lettering.
+        NSGraphicsContext.saveGraphicsState()
+        case.addClip()
+        reflection = NSBezierPath.bezierPathWithOvalInRect_(NSMakeRect(x-80,y-165,510,355))
+        NSGradient.alloc().initWithStartingColor_endingColor_(
+            color('#d6fff1', .12), color('#d6fff1', 0)).drawInBezierPath_angle_(reflection,90)
+        NSGraphicsContext.restoreGraphicsState()
+        inset = NSBezierPath.bezierPathWithRoundedRect_xRadius_yRadius_(
+            NSMakeRect(x+2,y+2,352,height-4),21,21)
+        color('#d0eee2', .07).setStroke()
+        inset.setLineWidth_(1)
+        inset.stroke()
         ox, oy = x+18, y+13
-        cx, cy = ox+160, oy+98
+        cx, cy = ox+160, oy+190
         text(provider, ox+160, oy+22, 15, '#e8eee9', False)
 
+        # Recessed upper-half dial, with a soft glass highlight.
+        lens = NSBezierPath.bezierPath()
+        for i in range(161):
+            dx,dy = position(-8+i/10,119)
+            (lens.moveToPoint_ if i == 0 else lens.lineToPoint_)((cx+dx,cy+dy))
+        lens.lineToPoint_((cx+119,cy+10))
+        lens.lineToPoint_((cx-119,cy+10))
+        lens.closePath()
+        NSGradient.alloc().initWithStartingColor_endingColor_(
+            color('#08110f'),color('#1d2c26')).drawInBezierPath_angle_(lens,90)
+        color('#aecfc1',.18).setStroke()
+        lens.setLineWidth_(1)
+        lens.stroke()
+        NSGraphicsContext.saveGraphicsState()
+        lens.addClip()
+        glare = NSBezierPath.bezierPathWithOvalInRect_(NSMakeRect(cx-180,cy-190,300,175))
+        NSGradient.alloc().initWithStartingColor_endingColor_(
+            color('#ecfff8',.18),color('#ecfff8',.01)).drawInBezierPath_angle_(glare,65)
+        NSGraphicsContext.restoreGraphicsState()
         for start,end,tint in [(-8,4,GREEN),(4,6,YELLOW),(6,8,RED)]:
             path = NSBezierPath.bezierPath()
             for i in range(121):
@@ -162,17 +197,35 @@ class MeterView(NSView):
                     path.moveToPoint_((cx+dx,cy+dy))
                 else:
                     path.lineToPoint_((cx+dx,cy+dy))
+            path.setLineWidth_(18)
+            color('#08110f').setStroke()
+            path.stroke()
             path.setLineWidth_(14)
             color(tint).setStroke()
             path.stroke()
+        circle(cx-105,cy,9,'#08110f')
+        circle(cx+105,cy,9,'#08110f')
         circle(cx-105,cy,7,GREEN)
         circle(cx+105,cy,7,RED)
+        for hours in (4,6):
+            a,b=position(hours,98),position(hours,112)
+            line((cx+a[0],cy+a[1]),(cx+b[0],cy+b[1]),'#08110f',2)
+        shine = NSBezierPath.bezierPath()
+        for i in range(161):
+            dx,dy=position(-8+i/10,109)
+            (shine.moveToPoint_ if i == 0 else shine.lineToPoint_)((cx+dx,cy+dy))
+        color('#f2fff9', .38).setStroke()
+        shine.setLineWidth_(1)
+        shine.stroke()
+        for half_hour in range(-16,17):
+            a,b=position(half_hour/2,91),position(half_hour/2,96)
+            line((cx+a[0],cy+a[1]),(cx+b[0],cy+b[1]),'#93aa9c',.8)
         for hours in (-8,-4,0,4,6,8):
-            a,b=position(hours,93),position(hours,99)
-            line((cx+a[0],cy+a[1]),(cx+b[0],cy+b[1]),'#718378',1)
+            a,b=position(hours,88),position(hours,96)
+            line((cx+a[0],cy+a[1]),(cx+b[0],cy+b[1]),'#adc1b5',1.2)
 
-        for label,px,py in [('BEHIND',55,72),('AHEAD',265,72),('−8h',55,85),
-                            ('+8h',265,85),('0h',160,225),('+4h',248,190),('+6h',277,149)]:
+        for label,px,py in [('BEHIND',55,232),('AHEAD',265,232),('−8h',55,218),
+                            ('+8h',265,218),('0h',160,67),('+4h',262,93),('+6h',293,146)]:
             text(label,ox+px,oy+py)
 
         result = self.results.get(provider, {})
@@ -183,8 +236,8 @@ class MeterView(NSView):
         valid = reading is not None and reading['resetsAt'] > now
         if valid:
             stale = reading['stale'] or now-reading.get('observedAt',0) > DISPLAY_MAX_AGE
-            text(f"{reading['used']:.0f}%",ox+160,oy+54,14,'#dde7df')
-            text('USED · STALE' if stale else 'USED',ox+160,oy+68)
+            text(f"{reading['used']:.0f}%",ox+160,oy+218,14,'#dde7df')
+            text('USED · STALE' if stale else 'USED',ox+160,oy+232)
             lead = reading['leadHours']
             dx,dy = position(lead,1)
             # One tapered white needle, with no arrowhead.
@@ -196,22 +249,29 @@ class MeterView(NSView):
             NSColor.whiteColor().setFill()
             needle.fill()
             pace_label = f'{lead:+.1f}h'.replace('-', '−')
-            tone = '#a9e3b9' if lead < 4 else YELLOW if lead <= 6 else RED
+            tone = '#a9e3b9' if lead < 4 else YELLOW if lead <= 6 else '#ff5b4d'
         else:
-            text('—',ox+160,oy+54,14,'#dde7df')
-            text('LOADING' if not result else 'UNAVAILABLE',ox+160,oy+68)
-            pace_label, tone = '—', '#93a098'
-        circle(cx,cy,8,'#111b15')
-        circle(cx,cy,5.5,'#728f7b')
-        circle(cx-1,cy-1,3.2,'#c3d5c8')
+            text('—',ox+160,oy+218,14,'#dde7df')
+            text('LOADING' if not result else 'UNAVAILABLE',ox+160,oy+232)
+            pace_label, tone = '—', '#c3d1c9'
+        circle(cx,cy,9,'#08110e')
+        hub = NSBezierPath.bezierPathWithOvalInRect_(NSMakeRect(cx-6.5,cy-6.5,13,13))
+        NSGradient.alloc().initWithStartingColor_endingColor_(
+            color('#e1f3ea'),color('#5a7b6a')).drawInBezierPath_angle_(hub,65)
+        circle(cx,cy,3,'#1e3c2c')
+        circle(cx-1,cy-1,1.5,'#d7efe1')
         line((ox+93,oy+241),(ox+227,oy+241),'#2e3932')
         label = ((reading or {}).get('label') or 'QUOTA').upper() + ' PACE · HOURS'
         text(label,ox+160,oy+256)
+        readout = NSBezierPath.bezierPathWithRoundedRect_xRadius_yRadius_(
+            NSMakeRect(ox+78,oy+260,164,35),7,7)
+        color('#101916').setFill()
+        readout.fill()
         text(pace_label,ox+160,oy+286,28,tone)
         status = result.get('summary', 'READING QUOTAS')
         if result and now-result.get('checkedAt',0) > DISPLAY_MAX_AGE:
             status = 'STALE · FRESH QUOTA REQUIRED'
-        text(status,ox+160,oy+309,8,RED if status.startswith(('PACE HOLD','STALE')) else '#93a098')
+        text(status,ox+160,oy+305,9,'#ff5b4d' if status.startswith(('PACE HOLD','STALE')) else '#c3d1c9')
 
     def drawRect_(self, rect):
         color('#0b0f0d').setFill()
@@ -222,13 +282,14 @@ class MeterView(NSView):
 
 class AppDelegate(NSObject):
     def applicationDidFinishLaunching_(self, notification):
+        self.demo_state = 'normal'
         self.busy = set()
         self.stopping = False
         self.window = NSWindow.alloc().initWithContentRect_styleMask_backing_defer_(
             NSMakeRect(0,0,WIDTH,HEIGHT),
             NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskResizable,
             NSBackingStoreBuffered, False)
-        self.window.setTitle_('LLM Pacing')
+        self.window.setTitle_('LLM Pacing · Demo' if DEMO else 'LLM Pacing')
         self.window.setContentMinSize_((297, 592.5))
         self.window.setAppearance_(NSAppearance.appearanceNamed_(NSAppearanceNameDarkAqua))
         self.window.setBackgroundColor_(color('#0b0f0d'))
@@ -237,7 +298,8 @@ class AppDelegate(NSObject):
         self.view.owner = self
         self.window.setContentView_(self.view)
         self.window.center()
-        self.window.setFrameAutosaveName_('LLMPacingWindow')
+        if not DEMO:
+            self.window.setFrameAutosaveName_('LLMPacingWindow')
         self.window.makeKeyAndOrderFront_(None)
         NSApplication.sharedApplication().activateIgnoringOtherApps_(True)
         self.installMenu()
@@ -259,15 +321,48 @@ class AppDelegate(NSObject):
         refresh = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_('Refresh Now','refresh:','r')
         refresh.setTarget_(self)
         submenu.addItem_(refresh)
+        if DEMO:
+            submenu.addItem_(NSMenuItem.separatorItem())
+            for index, state in enumerate(('normal','loading','unavailable','expired','stale','hold','hard','behind','on_pace')):
+                preview = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
+                    'Demo: '+state.replace('_',' ').title(), 'changeDemo:', str(index+1))
+                preview.setTag_(index)
+                preview.setTarget_(self)
+                submenu.addItem_(preview)
+        if DEMO:
+            for title, action, key in [('Demo: Minimum window','minimumDemo:','-'),
+                                       ('Demo: Default window','defaultDemo:','='),
+                                       ('Demo: Wide window','wideDemo:','0')]:
+                size_item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(title,action,key)
+                size_item.setTarget_(self)
+                submenu.addItem_(size_item)
         submenu.addItem_(NSMenuItem.separatorItem())
         submenu.addItem_(NSMenuItem.alloc().initWithTitle_action_keyEquivalent_('Quit LLM Pacing','terminate:','q'))
         item.setSubmenu_(submenu)
         NSApplication.sharedApplication().setMainMenu_(menu)
 
+    def minimumDemo_(self, sender):
+        self.window.setContentSize_((297,592.5))
+
+    def defaultDemo_(self, sender):
+        self.window.setContentSize_((WIDTH,HEIGHT))
+
+    def wideDemo_(self, sender):
+        self.window.setContentSize_((594,790))
+
+    def changeDemo_(self, sender):
+        self.demo_state = ('normal','loading','unavailable','expired','stale','hold','hard','behind','on_pace')[sender.tag()]
+        self.refresh_(None)
+
     def redraw_(self, sender):
         self.view.setNeedsDisplay_(True)
 
     def refresh_(self, sender):
+        if DEMO:
+            self.view.results = {} if self.demo_state == 'loading' else {
+                provider: demo_provider(provider, self.demo_state) for provider in ('Codex','Claude')}
+            self.view.setNeedsDisplay_(True)
+            return
         self.view.setNeedsDisplay_(True)
         for provider in ('Codex','Claude'):
             if provider not in self.busy:

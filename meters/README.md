@@ -1,10 +1,19 @@
 # Pacing meters
 
+## Meter preview
+
+Actual native app capture with synthetic readings; no account data is shown.
+
+<img src="../assets/meter-app.png" alt="Glassy upper semicircle Codex and Claude pacing gauges with red warnings and signed hour readings" width="360">
+
+See the [design and contrast checks](../docs/meter-design.md).
+
 ## Terminal
 
 From the repository root:
 
 ```sh
+python3 scripts/demo_meter.py  # Synthetic console output, no account access
 python3 codex/pace.py status
 python3 codex/pace.py watch
 python3 codex/pace.py status --bucket claude --claude-model opus
@@ -44,7 +53,8 @@ refresh. Stop with Ctrl-C. No remote listener or background service is installed
 cd meters
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements-native.txt
-.venv/bin/python native_app.py
+.venv/bin/python native_app.py --demo  # Synthetic readings, no account access
+.venv/bin/python native_app.py         # Live providers
 # Optional app bundle:
 .venv/bin/python setup.py py2app
 ```
@@ -76,3 +86,11 @@ latched at +6h while the graphical meter shows no hold warning. The browser
 instruments likewise are not a gate-state monitor. The terminal's textual pause
 summary does consult saved holds. Its colored individual bars are instantaneous
 threshold indicators, so color alone is not an authoritative hold verdict.
+
+## Manual demo states
+
+In native `--demo` mode, the Demo menu provides normal, loading, unavailable,
+expired, stale, weekly hold, hard cutoff, behind pace, and on-pace states
+(Cmd-1 through Cmd-9). Cmd-minus selects the minimum size, Cmd-equals restores
+the default, and Cmd-0 selects a wide window. Try both allowance and period
+selectors. Demo mode does not read account data or save display preferences.

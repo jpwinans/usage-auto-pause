@@ -10,22 +10,23 @@
     * { box-sizing:border-box; }
     body { min-width:312px; min-height:100vh; display:grid; place-items:center; margin:0; background:#0b0f0d; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; -webkit-font-smoothing:antialiased; }
     .widget { position:relative; width:min(356px,calc(100vw - 28px)); min-height:281px; padding:13px 18px 15px; border:1px solid var(--edge); border-radius:23px; background:radial-gradient(ellipse at 50% 25%,rgba(91,138,101,.12),transparent 52%),linear-gradient(145deg,#1b241f,var(--case) 70%); box-shadow:0 22px 60px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.05); overflow:hidden; }
-    .widget::before { content:""; position:absolute; inset:0 14% auto; height:1px; background:linear-gradient(90deg,transparent,rgba(198,229,204,.24),transparent); }
+    .widget::after { content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; box-shadow:inset 0 1px 1px rgba(220,255,239,.17),inset 0 -1px 1px rgba(0,0,0,.7); }
+    .widget::before { content:""; position:absolute; inset:0 14% auto; height:1px; background:linear-gradient(90deg,transparent,rgba(198,229,204,.5),transparent); }
     .gauge { display:block; width:100%; overflow:visible; }
     .meters { display:flex; flex-direction:column; align-items:center; gap:20px; padding:20px 0; }
     .window-switch { display:flex; justify-content:center; gap:3px; width:max-content; margin:9px auto 0; padding:3px; border:1px solid #34423a; border-radius:9px; background:#101612; }
-    .window-switch button { font:600 10px ui-monospace,monospace; border:0; border-radius:6px; padding:7px 12px; background:transparent; color:#93a098; cursor:pointer; }
-    .window-switch button[aria-pressed="true"] { color:#e8eee9; background:#2c3b31; }
+    .window-switch button { font:600 10px ui-monospace,monospace; border:0; border-radius:6px; padding:7px 12px; background:transparent; color:#c3d1c9; cursor:pointer; }
+    .window-switch button[aria-pressed="true"] { color:#e8eee9; background:#2c3b31; box-shadow:inset 0 -2px #c3d1c9; }
     .window-switch button:focus-visible { outline:2px solid #a9e3b9; }
     .arc { fill:none; stroke-width:14; stroke-linecap:butt; }
     .title { fill:#e8eee9; font:600 15px ui-sans-serif,system-ui,sans-serif; letter-spacing:.04em; }
-    .tick { stroke:#9aa69e; stroke-width:1.5; opacity:.62; }
+    .tick { stroke:#adc1b5; stroke-width:1.5; opacity:1; }
     .needle { fill:#ffffff; }
     .hub { fill:url(#hub-metal); stroke:#4d6054; stroke-width:1; }
     .used { fill:#dde7df; font:700 14px ui-monospace,monospace; letter-spacing:-.04em; }
-    .used-label,.end-label,.pace-label { fill:#93a098; font:700 7px ui-monospace,monospace; letter-spacing:.14em; }
+    .used-label,.end-label,.pace-label { fill:#c3d1c9; font:700 9px ui-monospace,monospace; letter-spacing:.14em; }
     .pace { fill:var(--yellow); font:700 28px ui-monospace,monospace; letter-spacing:-.10em; transition:fill .25s ease; }
-    .pace.safe { fill:var(--safe); } .pace.danger { fill:#f06555; } .bottom-rule { stroke:#2e3932; stroke-width:1; }
+    .pace.safe { fill:var(--safe); } .pace.danger { fill:#ff5b4d; } .bottom-rule { stroke:#2e3932; stroke-width:1; }
     @media (max-width:360px) { .widget { width:calc(100vw - 16px); padding-inline:10px; border-radius:18px; } }
     @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
   </style>
@@ -35,30 +36,35 @@
   <main class="widget" aria-label="Weekly Codex pacing">
     <svg class="gauge" viewBox="0 0 320 300" role="img" aria-label="Weekly pacing gauge, minus eight to plus eight hours">
       <defs>
+        <linearGradient id="dial-glass" x2=".3" y2="1"><stop stop-color="#304a3e"/><stop offset="1" stop-color="#09130f"/></linearGradient>
+        <linearGradient id="dial-sheen" x2=".5" y2="1"><stop stop-color="#eefff6" stop-opacity=".18"/><stop offset="1" stop-color="#eefff6" stop-opacity="0"/></linearGradient>
         <radialGradient id="hub-metal" cx="35%" cy="30%"><stop stop-color="#dbe9df"/><stop offset=".65" stop-color="#94ad9c"/><stop offset="1" stop-color="#43594b"/></radialGradient>
       </defs>
-      <path id="arc-red" class="arc" stroke="#f06555"/><path id="arc-yellow" class="arc" stroke="#f3c54f"/><path id="arc-green" class="arc" stroke="#68d58b"/>
-      <circle cx="55" cy="98" r="7" fill="#68d58b"/><circle cx="265" cy="98" r="7" fill="#f06555"/>
+      <path class="dial-face" d="M41 190 A119 119 0 0 1 279 190 L279 200 L41 200 Z" fill="url(#dial-glass)" stroke="#aecfc1" stroke-opacity=".18"/>
+      <path class="dial-reflection" d="M47 153 A119 119 0 0 1 226 92 Q158 151 47 153 Z" fill="url(#dial-sheen)"/>
+      <path id="dial-track" fill="none" stroke="#08110f" stroke-width="18" stroke-linecap="round"/>
+      <path id="arc-red" class="arc" stroke="#ff5148"/><path id="arc-yellow" class="arc" stroke="#f3c54f"/><path id="arc-green" class="arc" stroke="#68d58b"/>
+      <circle cx="55" cy="190" r="7" fill="#68d58b"/><circle cx="265" cy="190" r="7" fill="#ff5148"/>
       <g id="ticks"></g>
       <text class="title" x="160" y="22" text-anchor="middle">Codex</text>
-      <text class="end-label" x="55" y="85" text-anchor="middle">−8h</text><text class="end-label" x="265" y="85" text-anchor="middle">+8h</text>
-      <text class="end-label" x="55" y="72" text-anchor="middle">BEHIND</text><text class="end-label" x="265" y="72" text-anchor="middle">AHEAD</text>
-      <text class="end-label" x="160" y="225" text-anchor="middle">0h</text>
-      <text class="end-label" x="248" y="190" text-anchor="middle">+4h</text>
-      <text class="end-label" x="277" y="149" text-anchor="middle">+6h</text>
-      <text class="used" id="used" x="160" y="54" text-anchor="middle">—</text><text class="used-label" x="160" y="68" text-anchor="middle">USED</text>
-      <g id="needle" transform="translate(160 98)">
-        <path class="needle" d="M-2.2 -7 L0 91 L2.2 -7 Z"/>
+      <text class="end-label" x="55" y="218" text-anchor="middle">−8h</text><text class="end-label" x="265" y="218" text-anchor="middle">+8h</text>
+      <text class="end-label" x="55" y="232" text-anchor="middle">BEHIND</text><text class="end-label" x="265" y="232" text-anchor="middle">AHEAD</text>
+      <text class="end-label" x="160" y="67" text-anchor="middle">0h</text>
+      <text class="end-label" x="262" y="93" text-anchor="middle">+4h</text>
+      <text class="end-label" x="293" y="146" text-anchor="middle">+6h</text>
+      <text class="used" id="used" x="160" y="218" text-anchor="middle">—</text><text class="used-label" x="160" y="232" text-anchor="middle">USED</text>
+      <g id="needle" transform="translate(160 190)">
+        <path class="needle" d="M-2.2 7 L0 -91 L2.2 7 Z"/>
       </g>
-      <circle cx="160" cy="98" r="8" fill="#111b15"/><circle class="hub" cx="160" cy="98" r="5.5"/>
-      <line class="bottom-rule" x1="93" y1="241" x2="227" y2="241"/><text class="pace-label" x="160" y="256" text-anchor="middle">WEEKLY PACE · HOURS</text><text class="pace" id="pace" x="160" y="286" text-anchor="middle">—</text>
+      <circle cx="160" cy="190" r="8" fill="#111b15"/><circle class="hub" cx="160" cy="190" r="5.5"/>
+      <line class="bottom-rule" x1="93" y1="241" x2="227" y2="241"/><text class="pace-label" x="160" y="256" text-anchor="middle">WEEKLY PACE · HOURS</text><rect x="78" y="263" width="164" height="32" rx="7" fill="#101916"/><text class="pace" id="pace" x="160" y="286" text-anchor="middle">—</text>
     </svg>
   </main>
   </section>
   <script>
-    const cx=160,cy=98,radius=105,NS="http://www.w3.org/2000/svg";
-    function point(percent,r=radius){const a=Math.PI*(1-percent/100);return[cx+r*Math.cos(a),cy+r*Math.sin(a)];}
-    function arc(start,end){const a=point(start),b=point(end);return "M "+a[0].toFixed(2)+" "+a[1].toFixed(2)+" A "+radius+" "+radius+" 0 0 0 "+b[0].toFixed(2)+" "+b[1].toFixed(2);}
+    const cx=160,cy=190,radius=105,NS="http://www.w3.org/2000/svg";
+    function point(percent,r=radius){const a=Math.PI*(1-percent/100);return[cx+r*Math.cos(a),cy-r*Math.sin(a)];}
+    function arc(start,end){const a=point(start),b=point(end);return "M "+a[0].toFixed(2)+" "+a[1].toFixed(2)+" A "+radius+" "+radius+" 0 0 1 "+b[0].toFixed(2)+" "+b[1].toFixed(2);}
     // Fixed symmetric scale: zero is centered; the exact readout is never clamped.
     function pacePosition(hours){return (Math.max(-8,Math.min(8,hours))+8)/16*100;}
     const codex = document.querySelector('.widget');
@@ -71,11 +77,14 @@
       root.querySelector('.title').textContent=name;
       root.setAttribute('aria-label',name+' pacing');
       root.querySelector('svg').setAttribute('aria-label',name+' pacing, minus eight to plus eight hours');
+      part(root,'dial-track').setAttribute('d',arc(0,100));
       [['arc-green',-8,4],['arc-yellow',4,6],['arc-red',6,8]].forEach(([id,start,end])=>part(root,id).setAttribute('d',arc(pacePosition(start),pacePosition(end))));
-      [-8,-4,0,4,6,8].forEach(hours=>{const a=point(pacePosition(hours),93),b=point(pacePosition(hours),99),line=document.createElementNS(NS,'line');line.setAttribute('class','tick');line.setAttribute('x1',a[0]);line.setAttribute('y1',a[1]);line.setAttribute('x2',b[0]);line.setAttribute('y2',b[1]);part(root,'ticks').append(line);});
+      [-8,-4,0,4,6,8].forEach(hours=>{const a=point(pacePosition(hours),88),b=point(pacePosition(hours),96),line=document.createElementNS(NS,'line');line.setAttribute('class','tick');line.setAttribute('x1',a[0]);line.setAttribute('y1',a[1]);line.setAttribute('x2',b[0]);line.setAttribute('y2',b[1]);part(root,'ticks').append(line);});
     }
     // Both instruments share the same metallic pivot definition.
     document.querySelectorAll('.hub').forEach(el=>el.style.fill='url(#codex-hub-metal)');
+    document.querySelectorAll('.dial-face').forEach(el=>el.style.fill='url(#codex-dial-glass)');
+    document.querySelectorAll('.dial-reflection').forEach(el=>el.style.fill='url(#codex-dial-sheen)');
     let claudeWindow='weekly', claudeData={};
     const controls=document.createElement('div');
     controls.className='window-switch';controls.setAttribute('role','group');controls.setAttribute('aria-label','Claude usage window');
@@ -89,8 +98,8 @@
       part(root,'needle').style.visibility=valid?'visible':'hidden';
       root.querySelector('.used-label').textContent=valid?(reading.stale?'USED · STALE':'USED'):'UNAVAILABLE';
       if(!valid){part(root,'used').textContent='—';part(root,'pace').textContent='—';return;}
-      const angle=(50-pacePosition(reading.leadHours))*1.8;
-      part(root,'needle').setAttribute('transform','translate(160 98) rotate('+angle+')');
+      const angle=(pacePosition(reading.leadHours)-50)*1.8;
+      part(root,'needle').setAttribute('transform','translate(160 190) rotate('+angle+')');
       part(root,'used').textContent=Math.round(reading.used)+'%';
       const pace=part(root,'pace');
       pace.textContent=(reading.leadHours>0?'+':reading.leadHours<0?'−':'±')+Math.abs(reading.leadHours).toFixed(1)+'h';

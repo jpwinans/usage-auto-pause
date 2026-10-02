@@ -33,3 +33,6 @@ config.toml
 active-session.json
 session-pace.json
 sessions/
+
+# Generated icon intermediates.
+meters/assets/*.iconset/

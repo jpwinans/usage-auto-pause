@@ -15,8 +15,8 @@ python3 meters/widget.py --demo --once
 The check runner parses Python syntax and runs the three unittest suites in
 separate processes, with temporary Claude/Codex/cache state. Provider calls and
 clock waits in those tests use fixtures or mocks. It also runs Claude's built-in
-rule selftest. On Python 3.11, **61 tests pass** (49 shared/Codex, 4 Claude model
-switch, 8 meter/demo), plus the selftest.
+rule selftest. On Python 3.11, **64 tests pass** (49 shared/Codex, 4 Claude model
+switch, 11 meter/demo), plus the selftest.
 
 Covered behavior includes strict >98%, +8/+4 hysteresis, bucket/model separation,
 concurrent hold writers, separate-process latch persistence, reset changes,
@@ -27,12 +27,11 @@ routes do not call live quota readers and label their HTML as a demo.
 The offline replay demonstrates both engines at +7, +8, +6, stale +6, fresh +6,
 and +4 hours, followed by 98% and 98.1% hard-cutoff cases. The browser demo JSON
 was checked, and a real localhost Codex demo endpoint returned the expected
-synthetic response. No connected browser was available for visual verification.
+synthetic response. Browser visual verification remains blocked by UI approval review; the native demo was manually inspected across all nine states, both selectors, and minimum/default/wide sizes. See [meter design](meter-design.md).
 The native app bundle also built successfully with the existing Python 3.11 /
 py2app environment after a sandboxed attempt aborted. Its bundled Claude helper
 was verified present and importable using the frozen-app path resolver. The build
-reported missing platform-conditional modules (Windows/JVM); no live native UI
-or account refresh was exercised. Build output was kept outside the repo.
+reported missing platform-conditional modules (Windows/JVM); no live account refresh was exercised. Build output was kept outside the repo.
 
 No real account quotas, installed hooks, billing settings, or multi-day waits
 were exercised by this verification.

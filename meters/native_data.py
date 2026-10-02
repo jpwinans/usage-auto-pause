@@ -97,3 +97,32 @@ def fetch_provider(provider):
     except Exception:
         return {'provider': provider, 'windows': {}, 'checkedAt': time.time(),
                 'summary': 'STALE · FRESH QUOTA REQUIRED', 'problem': True, 'failed': True}
+
+
+def demo_provider(provider, state="normal"):
+    """Synthetic readings for screenshots and previews; never reads accounts."""
+    now = time.time()
+    def row(used, hours, label):
+        return dict(used=used, leadHours=(used-50)/100*hours,
+                    resetsAt=now+hours*1800, observedAt=now, stale=False, label=label)
+    windows = {'weekly': row(54 if provider == 'Codex' else 48, 168, '7D weekly')}
+    if provider == 'Claude':
+        windows.update(session=row(32, 5, '5H session'),
+                       **{'seven_day:Fable': row(52, 168, '7D weekly Fable')})
+    problem = None
+    if state == 'unavailable':
+        windows = {}
+    elif state == 'expired':
+        for reading in windows.values():
+            reading['resetsAt'] = now-1
+    elif state == 'stale':
+        problem = 'demo refresh unavailable'
+        for reading in windows.values():
+            reading['stale'] = True
+    elif state in ('hold', 'hard', 'behind', 'on_pace'):
+        for key, reading in windows.items():
+            hours = 5 if key == 'session' else 168
+            used = {'hold': 55, 'hard': 99, 'behind': 40, 'on_pace': 50}[state]
+            reading.update(used=used, leadHours=(used-50)/100*hours)
+    return dict(provider=provider, windows=windows, checkedAt=now,
+                summary=summary(windows, problem), problem=problem, failed=False)

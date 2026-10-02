@@ -41,11 +41,11 @@
   },
   {
     "file": "meters/native_data.py",
-    "sha256": "55db92624765088dd4d7da8898cb7ecba3d24e0c73c6dd03e8acadf9609e656b"
+    "sha256": "c2419d82f11fd958d80f0582656d5d986e43e539ceb0ab40449f4896f9d7f829"
   },
   {
     "file": "meters/native_app.py",
-    "sha256": "323a3b39b0a84db84f7aff48bc2ef2b0026740af0076ca7f820a341e24b2aa73"
+    "sha256": "09dbfb917062c7e3c54c48fe41ae1ba9e6a6782fede731108d10c0ecfa47c107"
   },
   {
     "file": "meters/setup.py",
@@ -61,14 +61,14 @@
   },
   {
     "file": "meters/index.html",
-    "sha256": "e0419fe413b60f1e675e02fbf820f02b4994dea31ba753d5a3095482383aa387"
+    "sha256": "4cf28c3180e3b944152c62e369924892587d9733460429fd02eca00ffea44ec8"
   },
   {
     "file": "meters/make_icon.py",
-    "sha256": "0120a8581333ae8fe6844b8bfe44328ee5d8c538d89bcd64262f1a464ebbdf9d"
+    "sha256": "268c954d86ab84fdb1e19d84ffde1d62335465689ec56da609a3b5a648a90d8f"
   },
   {
     "file": "meters/assets/LLMPacing.icns",
-    "sha256": "1da34dc902ef6590e47875d8976345064cf7beb3c77affb50d5e539fa7b63061"
+    "sha256": "3ad3dd22e85ab9cad52a66ca98eb04e422c5d69f058240f78bb4f372fe50bc94"
   }
 ]
